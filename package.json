@@ -1,0 +1,29 @@
+{
+  "name": "di18n",
+  "version": "0.1.0",
+  "description": "",
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "dopublish": "npm run lint && npm run build && lerna publish",
+    "lint": "eslint packages",
+    "build": "lerna run build",
+    "test": "jest",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "author": "",
+  "license": "MIT",
+  "bin": {
+    "di18n": "./bin/index.js"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.11",
+    "eslint-config-airbnb-base": "^14.1.0",
+    "jest": "^24.7.1",
+    "lerna": "^3.20.2",
+    "vuepress": "^1.4.0"
+  }
+}
