@@ -11,7 +11,7 @@
     "docs:build": "vuepress build docs"
   },
   "dependencies": {
-    "di18n-core": "^0.20.11",
+    "di18n-core": "^0.1.0",
     "@vitalets/google-translate-api": "^2.7.0",
     "axios": "^0.19.0",
     "babel-template": "^6.26.0",
