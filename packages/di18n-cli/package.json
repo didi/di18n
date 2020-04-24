@@ -11,12 +11,12 @@
     "docs:build": "vuepress build docs"
   },
   "dependencies": {
-    "di18n-core": "^0.1.0",
     "@vitalets/google-translate-api": "^2.7.0",
     "axios": "^0.19.0",
     "babel-template": "^6.26.0",
     "chalk": "^2.4.1",
     "commander": "^2.18.0",
+    "di18n-core": "^0.1.0",
     "glob": "^7.1.6",
     "inquirer": "^6.2.2",
     "parse5": "^5.1.0",
