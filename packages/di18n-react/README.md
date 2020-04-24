@@ -5,10 +5,8 @@ di18n-react 是 React 的辅助库，以便在 React 中使用 di18n，该库对
 ## 安装
 
 ```shell
-$ npm i -S di18n-react@0.20
+$ npm i -S di18n-react
 ```
-
-**注意**：需要使用 version >= 0.20 的版本。
 
 ## 使用
 
