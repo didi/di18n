@@ -226,8 +226,9 @@ class ReactIntlUniversal {
     invariant(options.currentLocale, 'options.currentLocale is required');
     invariant(options.locales, 'options.locales is required');
 
-    Object.assign(this.options, options);
+    this.load(options.locales);
 
+    this.options.currentLocale = options.currentLocale;
     this.options.formats = Object.assign({}, this.options.formats, constants.defaultFormats);
 
     return new Promise((resolve, reject) => {
