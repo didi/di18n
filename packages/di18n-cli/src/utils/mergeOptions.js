@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const defaultOptions = require('./options');
+const defaultOptions = require('./reactOptions');
 const log = require('./log');
 
 const cwdPath = process.cwd();

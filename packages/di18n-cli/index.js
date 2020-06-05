@@ -5,8 +5,9 @@ program
   .command('init')
   .alias('i')
   .description('init locales conf')
-  .action(function() {
-    initFileConf(program.opts());
+  .option('--vue', 'init for vue project')
+  .action(function(options) {
+    initFileConf(options.vue);
   })
   .on('--help', function() {
     console.log('  Examples:');

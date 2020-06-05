@@ -4,7 +4,8 @@ const path = require('path');
 const inquirer = require('inquirer');
 const prettier = require('prettier');
 const FileConf = require('../conf/FileConf');
-const defaultOptions = require('../utils/options');
+const reactOptions = require('../utils/reactOptions');
+const vueOptions = require('../utils/vueOptions');
 const log = require('../utils/log');
 
 function getLocaleFiles({ path, exclude }) {
@@ -54,10 +55,11 @@ async function doInquire() {
   return ans;
 }
 
-module.exports = async function initFileConf() {
+module.exports = async function initFileConf(isVue) {
   const answers = await doInquire();
   const { localePath = 'locales', firstI18n } = answers;
 
+  const defaultOptions = isVue ? vueOptions : reactOptions;
   const options = {
     ...defaultOptions,
     localeConf: { type: 'file', folder: localePath },
