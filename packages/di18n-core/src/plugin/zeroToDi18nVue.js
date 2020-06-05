@@ -5,13 +5,59 @@ const parse5 = require('parse5');
 const parse = require('pug-parser');
 const lex = require('pug-lexer');
 const genSource = require('pug-source-gen');
-const getPlugin = require('./zeroToDi18nReact');
-const tagReplace = require('./replace-i-tag');
+const _transformJs = require('../transform/_transformJs');
+
+// override to avoid unneeded escape
+// pug-source-gen/lib/code-generator.js
+genSource.CodeGenerator.prototype.attrs = function(attrs) {
+  var regularAttrs = [];
+  var classes = '';
+  var id;
+  attrs.forEach(function(attr) {
+    var constVal = '';
+    try {
+      constVal = constantinople.toConstant(attr.val);
+    } catch (ex) {}
+
+    if (attr.name === 'class' && !attr.escaped && constVal &&
+               /^\-?[_a-z][_a-z0-9\-]*$/i.test(constVal)) {
+      classes += '.' + constVal;
+    } else if (attr.name === 'id' && !id && !attr.escaped && constVal &&
+               /^[\w-]+$/.test(constVal)) {
+      id = constVal;
+    } else {
+      var attrOut = '';
+
+      // name
+      if (/^\w[^()[\]=!,`'"\s]*$/.test(attr.name)) {
+        attrOut += attr.name;
+      } else {
+        var name = attr.name.replace(/\\/g, '\\\\');
+        attrOut += name;
+      }
+
+      if (!(typeof constVal === 'boolean' && constVal === true)) {
+        // operator
+        attrOut += '=';
+
+        // value
+        attrOut += attr.val;
+      }
+
+      regularAttrs.push(attrOut);
+    }
+  }.bind(this));
+
+  var out = '';
+  if (id) out += '#' + id;
+  out += classes;
+  if (regularAttrs.length) out += '(' + regularAttrs.join(' ') + ')';
+
+  return out;
+}
 
 const matchReg = /[\u4e00-\u9fa5]+/g;
 const matchQuoteReg = /['"][\u4e00-\u9fa5]+['"]/g;
-
-let transformJS = val => ({ code: val });
 
 function judgeChinese(text) {
   const val = typeof text === 'string' ? text.replace(/"|'/g, '') : text;
@@ -45,6 +91,89 @@ function hasReplaced(text) {
   return text.indexOf('$t') >= 0;
 }
 
+function openTag(sfcBlock) {
+  const { type, lang, src, scoped, module, attrs } = sfcBlock;
+
+  let tag = `<${type}`;
+  if (lang) tag += ` lang="${lang}"`;
+  if (src) tag += ` src="${src}"`;
+  if (scoped) tag += ' scoped';
+  if (module) {
+    if (typeof module === 'string') tag += ` module="${module}"`;
+    else tag += ' module';
+  }
+  for (let k in attrs) {
+    if (!['type', 'lang', 'src', 'scoped', 'module'].includes(k)) {
+      tag += ` ${k}="${attrs[k]}"`
+    }
+  }
+  tag += '>';
+
+  return tag;
+}
+
+function closeTag(sfcBlock) {
+  return '</' + sfcBlock.type + '>';
+}
+
+function combineVue(template, script, sytles, customBlocks) {
+  return [template, script, ...sytles, ...customBlocks]
+    .map(sfc => `${openTag(sfc)}\n${sfc.content.trim()}\n${closeTag(sfc)}\n`)
+    .join('\n');
+}
+
+function pascalToKebab(pascalStr) {
+  if (pascalStr === '') return '';
+
+  // 标记第一个字符的大小写
+  let s = /[A-Z]/.test(pascalStr[0]) ? 's' : 'l';
+
+  for (let i = 0; i < pascalStr.length; i++) {
+    if (/[A-Z]/.test(pascalStr[i])) s += '-' + pascalStr[i].toLowerCase();
+    else s += pascalStr[i];
+  }
+
+  return s;
+}
+
+function kebabToPascal(kebabStr) {
+  if (kebabStr === '') return '';
+
+  // 确定第一个字符的大小写
+  let s = kebabStr[0] === 's' ? kebabStr[2].toUpperCase() : kebabStr[2];
+
+  for (let i = 3; i < kebabStr.length; i++) {
+    if (kebabStr[i] === '-') {
+      i++;
+      s += kebabStr[i].toUpperCase();
+    } else {
+      s += kebabStr[i];
+    }
+  }
+
+  return s;
+}
+
+function getIgnoreLines(tpl) {
+  console.log(333333, tpl, typeof tpl)
+  // 仅支持 // di18n-disable 和 // di18n-enable 注释指令
+  const ignores = [];
+  let ignoring = false;
+
+  const lines = tpl.split(/\n|\r\n/g);
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes('di18n-disable')) ignoring = true;
+    if (lines[i].includes('di18n-enable')) ignoring = false;
+    if (ignoring) ignores.push(i + 1);
+  }
+
+  return ignores;
+}
+
+function isIgnoreNode(node, ignores) {
+  return node.line && ignores.includes(node.line);
+}
+
 /**
  * 将 html 转成 ast 遍历进行操作
  * @param  {} node
@@ -67,7 +196,12 @@ function traverse(node, allTranslatedWord, keysInUse) {
           attr.name = ':' + attr.name;
         } else if (attr.name.startsWith(':') || attr.name.startsWith('v-')) {
           attr.value = attr.value.replace(matchQuoteReg, match => {
-            return makeReplace(match, allTranslatedWord, keysInUse, attr.value);
+            return makeReplace(
+              match,
+              allTranslatedWord,
+              keysInUse,
+              attr.value
+            );
           });
         }
       }
@@ -89,7 +223,7 @@ function traverse(node, allTranslatedWord, keysInUse) {
         });
       } else {
         const tmp = value.replace(/{{/, '{').replace(/}}/, '}');
-        const code = transformJS(`<T>${tmp}</T>`).code || '';
+        const code = `<T>${tmp}</T>`;
 
         node.val = code
           .replace(/{/, '{{')
@@ -114,12 +248,18 @@ function traverse(node, allTranslatedWord, keysInUse) {
  * @param  {} allTranslatedWord
  * @param  {} keysInUse
  */
-function traversePug(node, allTranslatedWord, keysInUse) {
+function traversePug(node, allTranslatedWord, keysInUse, ignores) {
   if (node.type === 'Tag' && node.block) {
-    traversePug(node.block, allTranslatedWord, keysInUse);
+    traversePug(node.block, allTranslatedWord, keysInUse, ignores);
   }
 
-  if (node.attrs && node.attrs.length > 0) {
+  if (node.type === 'Block' && node.nodes && node.nodes.length > 0) {
+    node.nodes.forEach(obj => {
+      traversePug(obj, allTranslatedWord, keysInUse, ignores);
+    });
+  }
+
+  if (!isIgnoreNode(node, ignores) && node.attrs && node.attrs.length > 0) {
     node.attrs.forEach(attr => {
       if (judgeChinese(attr.val) && !hasReplaced(attr.val)) {
         // 有中文需要被替换，且没有被替换过。
@@ -141,7 +281,7 @@ function traversePug(node, allTranslatedWord, keysInUse) {
   }
 
   // 处理innerText
-  if (node.type === 'Text') {
+  if (!isIgnoreNode(node, ignores) && node.type === 'Text') {
     let value = node.val;
     if (judgeChinese(value) && !hasReplaced(value)) {
       // 有中文需要被替换，且没有被替换过
@@ -158,7 +298,7 @@ function traversePug(node, allTranslatedWord, keysInUse) {
         });
       } else {
         const tmp = value.replace(/{{/, '{').replace(/}}/, '}');
-        const code = transformJS(`<T>${tmp}</T>`).code || '';
+        const code = `<T>${tmp}</T>`;
 
         node.val = code
           .replace(/{/, '{{')
@@ -169,33 +309,15 @@ function traversePug(node, allTranslatedWord, keysInUse) {
       }
     }
   }
-
-  if (node.type === 'Block' && node.nodes && node.nodes.length > 0) {
-    node.nodes.forEach(obj => {
-      traversePug(obj, allTranslatedWord, keysInUse);
-    });
-  }
 }
 
 function splitVueFile(filePath) {
-  let fileString = fs.readFileSync(filePath).toString();
-  let vueFile = compiler.parseComponent(fileString, {
+  const fileString = fs.readFileSync(filePath).toString();
+  const sfc = compiler.parseComponent(fileString, {
     pad: 'space',
     deindent: false,
   });
-  const templateContent = vueFile.template.content;
-  const scriptContent = vueFile.script.content;
-  const styleContent = vueFile.styles.map(s => s.content).join('\n');
-  const templateType = vueFile.template.lang || 'html'; // 获取模板类型，默认为 html
-  const styleType = (vueFile.styles.length && vueFile.styles[0].lang) || 'css'; // 获取 style 类型，默认为 css(前面将多个styleContent合并一起了，以至于后面获取 styletype 只默认取第一个)
-
-  return {
-    templateContent,
-    scriptContent,
-    styleContent,
-    templateType,
-    styleType,
-  };
+  return sfc;
 }
 
 function generateTemplateCode(
@@ -204,15 +326,17 @@ function generateTemplateCode(
   keysInUse,
   templateType
 ) {
+  const ignores = getIgnoreLines(templateContent);
+
   if (templateType === 'pug') {
     const tokens = lex(templateContent.trim());
     let ast = parse(tokens); // 解析 pug 字符串
-    traversePug(ast, allTranslatedWord, keysInUse); // 处理需要翻译的字段
+    traversePug(ast, allTranslatedWord, keysInUse, ignores); // 处理需要翻译的字段
     let pugstr = genSource(ast);
     return pugstr;
   }
 
-  templateContent = tagReplace.replaceTemplateTag1(templateContent);
+  templateContent = pascalToKebab(templateContent);
 
   const document = parse5.parse(templateContent); // 解析 html 字符串
   const root = document.childNodes[0].childNodes[1];
@@ -228,41 +352,9 @@ function generateTemplateCode(
     str = str.slice(25, -14);
   }
 
-  str = tagReplace.replaceTemplateTag2(str);
+  str = kebabToPascal(str);
 
   return str;
-}
-
-// Script片段生成ast
-function generateAST(source) {
-  return {
-    code: source,
-  };
-
-  // FIXME: [BABEL] unknown: .ImportDeclaration is not a valid Plugin property
-  // let result = babel.transform(
-  //   source,
-  //   options
-  // );
-  // let code1 = result.code;
-  // let map = result.map;
-  // let metadata = result.metadata;
-  // let ast = result.ast;
-
-  // if (
-  //   map &&
-  //   (!map.sourcesContent ||
-  //     !map.sourcesContent.length)
-  // ) {
-  //   map.sourcesContent = [source];
-  // }
-
-  // return {
-  //   code: code1,
-  //   map: map,
-  //   metadata: metadata,
-  //   ast: ast,
-  // };
 }
 
 function translateVue({
@@ -272,7 +364,6 @@ function translateVue({
   keysInUse,
   ignoreComponents,
   ignoreMethods,
-  ignoreLines,
 }) {
   const outObj = {
     hasReactIntlUniversal: false,
@@ -280,109 +371,53 @@ function translateVue({
     keysInUse: keysInUse,
   };
 
-  const plugin = getPlugin(
-    allTranslatedWord,
-    updatedTranslatedWord,
-    outObj,
-    'this' /* intlAlias */,
-    '$t' /* translate method */,
-    ignoreComponents,
-    ignoreMethods,
-    ignoreLines
-  );
-
   const {
-    templateContent,
-    scriptContent,
-    styleContent,
-    templateType,
-    styleType,
+    template,
+    script,
+    styles,
+    customBlocks
   } = splitVueFile(filePath);
 
-  // const pluginForTpl = getPlugin(
-  //   allTranslatedWord,
-  //   updatedTranslatedWord,
-  //   outObj,
-  //   '' /* intlAlias */,
-  //   '$t' /* translate method */,
-  //   ignoreComponents,
-  //   ignoreMethods,
-  //   ignoreLines
-  // );
-
-  // FIXME: [BABEL] unknown: .ImportDeclaration is not a valid Plugin property
-  // transformJS = souceCode =>
-  //   generateAST(souceCode, {
-  //     sourceType: 'module',
-  //     plugins: [
-  //       '@babel/plugin-syntax-jsx',
-  //       '@babel/plugin-proposal-optional-chaining',
-  //       '@babel/plugin-syntax-class-properties',
-  //       ['@babel/plugin-syntax-decorators', { legacy: true }],
-  //       '@babel/plugin-syntax-object-rest-spread',
-  //       '@babel/plugin-syntax-async-generators',
-  //       '@babel/plugin-syntax-do-expressions',
-  //       '@babel/plugin-syntax-dynamic-import',
-  //       '@babel/plugin-syntax-export-extensions',
-  //       '@babel/plugin-syntax-function-bind',
-  //       pluginForTpl,
-  //     ],
-  //   });
-  transformJS = souceCode => souceCode;
+  const templateContent = template.content;
+  const templateType = template.lang || 'html';
+  const scriptContent = script.content;
 
   const templatecode = generateTemplateCode(
     templateContent,
     allTranslatedWord,
     keysInUse,
-    templateType,
-    styleType
+    templateType
   );
 
-  const scriptAST = generateAST(scriptContent, {
-    sourceType: 'module',
-    plugins: [
-      '@babel/plugin-syntax-jsx',
-      '@babel/plugin-proposal-optional-chaining',
-      '@babel/plugin-syntax-class-properties',
-      ['@babel/plugin-syntax-decorators', { legacy: true }],
-      '@babel/plugin-syntax-object-rest-spread',
-      '@babel/plugin-syntax-async-generators',
-      '@babel/plugin-syntax-do-expressions',
-      '@babel/plugin-syntax-dynamic-import',
-      '@babel/plugin-syntax-export-extensions',
-      '@babel/plugin-syntax-function-bind',
-      plugin,
-    ],
-  });
+  const scriptCode = _transformJs(
+    scriptContent,
+    allTranslatedWord,
+    updatedTranslatedWord,
+    keysInUse,
+    {
+      intlAlias: 'this',
+      ignoreComponents: ignoreComponents || [],
+      ignoreComponents: ignoreMethods || [],
+      importCode: '',
+      i18nObject: '',
+      i18nMethod: '$t',
+    }
+  );
 
-  // TODO: 根据是否有需要替换文案，决定是否重写源码
-  // const { translateWordsNum } = outObj;
+  template.content = templatecode;
+  script.content = scriptCode;
 
-  let code = '';
-  code = prettier.format(
-    '<template lang='
-    + templateType
-    + '>\n'
-    + templatecode
-    + '\n</template>\n'
-    + '<script>\n'
-    + scriptAST.code
-    + '\n</script>\n'
-    + '<style lang='
-    + styleType
-    + '>\n'
-    + styleContent
-    + '\n</style>\n',
-
-    // TODO: vue 文件的格式化选项抽出为配置
-    { parser: 'vue', semi: false, singleQuote: true }
-  ); // 注意空标签的处理
+  const code = combineVue(template, script, styles, customBlocks);
 
   return {
-    // isRewritten: translateWordsNum !== 0,
-    code: code,
-    isRewritten: true,
-  };
+    code: prettier.format(code, {
+      parser: 'vue',
+      semi: false,
+      singleQuote: true
+    }),
+
+    isRewritten: true
+  }
 }
 
 module.exports = translateVue;
