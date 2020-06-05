@@ -7,8 +7,8 @@ const lex = require('pug-lexer');
 const genSource = require('pug-source-gen');
 const _transformJs = require('../transform/_transformJs');
 
-// override to avoid unneeded escape
-// pug-source-gen/lib/code-generator.js
+/* eslint-disable */
+// override to avoid unneeded escape: pug-source-gen/lib/code-generator.js
 genSource.CodeGenerator.prototype.attrs = function(attrs) {
   var regularAttrs = [];
   var classes = '';
@@ -55,6 +55,7 @@ genSource.CodeGenerator.prototype.attrs = function(attrs) {
 
   return out;
 }
+/* eslint-enable */
 
 const matchReg = /[\u4e00-\u9fa5]+/g;
 const matchQuoteReg = /['"][\u4e00-\u9fa5]+['"]/g;
@@ -104,7 +105,7 @@ function openTag(sfcBlock) {
   }
   for (let k in attrs) {
     if (!['type', 'lang', 'src', 'scoped', 'module'].includes(k)) {
-      tag += ` ${k}="${attrs[k]}"`
+      tag += ` ${k}="${attrs[k]}"`;
     }
   }
   tag += '>';
@@ -155,7 +156,6 @@ function kebabToPascal(kebabStr) {
 }
 
 function getIgnoreLines(tpl) {
-  console.log(333333, tpl, typeof tpl)
   // 仅支持 // di18n-disable 和 // di18n-enable 注释指令
   const ignores = [];
   let ignoring = false;
@@ -365,17 +365,11 @@ function translateVue({
   ignoreComponents,
   ignoreMethods,
 }) {
-  const outObj = {
-    hasReactIntlUniversal: false,
-    translateWordsNum: 0,
-    keysInUse: keysInUse,
-  };
-
   const {
     template,
     script,
     styles,
-    customBlocks
+    customBlocks,
   } = splitVueFile(filePath);
 
   const templateContent = template.content;
@@ -397,7 +391,7 @@ function translateVue({
     {
       intlAlias: 'this',
       ignoreComponents: ignoreComponents || [],
-      ignoreComponents: ignoreMethods || [],
+      ignoreMethods: ignoreMethods || [],
       importCode: '',
       i18nObject: '',
       i18nMethod: '$t',
@@ -413,11 +407,11 @@ function translateVue({
     code: prettier.format(code, {
       parser: 'vue',
       semi: false,
-      singleQuote: true
+      singleQuote: true,
     }),
 
-    isRewritten: true
-  }
+    isRewritten: true,
+  };
 }
 
 module.exports = translateVue;

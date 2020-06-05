@@ -1,4 +1,3 @@
-const path = require('path');
 const prettier = require('prettier');
 const babel = require('@babel/core');
 const generate = require('@babel/generator').default;
@@ -28,12 +27,12 @@ function getIgnoreLines(ast) {
     if (type === 'CommentLine' && value.trim() === 'di18n-disable-line') {
       ignoreBlocks.push({
         start: loc.start.line,
-        end: loc.start.line
+        end: loc.start.line,
       });
     } else if (type === 'CommentBlock' && value.trim() === 'di18n-disable') {
       if (last < 0 || ignoreBlocks[last].end) {
         ignoreBlocks.push({
-          start: loc.start.line
+          start: loc.start.line,
         });
       }
     } else if (type === 'CommentBlock' && value.trim() === 'di18n-enable') {
@@ -45,7 +44,7 @@ function getIgnoreLines(ast) {
 
   // 如果缺少 disable-enable，直接作用到最后一行
   const len = ignoreBlocks.length;
-  if (len > 0 && !ignoreBlocks[len- 1].end) {
+  if (len > 0 && !ignoreBlocks[len - 1].end) {
     ignoreBlocks[len - 1].end = ast.loc.end.line;
   }
 
@@ -109,7 +108,7 @@ module.exports = function _transformJs(
     importCode,
     i18nObject,
     i18nMethod,
-    isTSX
+    isTSX,
   } = option;
 
 
@@ -189,4 +188,4 @@ module.exports = function _transformJs(
   }
 
   return sourceCode;
-}
+};

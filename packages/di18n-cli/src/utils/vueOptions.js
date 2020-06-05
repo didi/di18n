@@ -39,7 +39,7 @@ module.exports = {
 
   // import codes, <string>
   // e.g. "import { intl } from 'di18n-react';"
-  importCode: "",
+  importCode: '',
 
   // i18n object, <string>
   // e.g. 'intl'

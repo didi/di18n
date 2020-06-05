@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const rootPath = require('./rootPath');
 const collect = require('../command/collect');
 

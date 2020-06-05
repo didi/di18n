@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const vuePlugin = require('../plugin/zeroToDi18nVue');
-const _transformJs = require('../transform/_transformJs');
+const _transformJs = require('./_transformJs');
 const log = require('../utils/log');
 
 function transformReact(
@@ -38,8 +38,6 @@ function transformVue(
 ) {
   const { filePath, currentEntry, currentOutput } = codeFileInfo;
   const { ignoreComponents, ignoreMethods } = option;
-
-  const sourceCode = fs.readFileSync(filePath, 'utf8');
 
   let outObj = {
     hasReactIntlUniversal: false,
