@@ -1,0 +1,18 @@
+{
+  "presets": [
+    ["@babel/preset-env", { "modules": "umd" }],
+    ["@vue/babel-preset-jsx", { "injectH": false }]
+  ],
+  "plugins": [
+    "@babel/plugin-syntax-dynamic-import",
+    ["import", {
+      "libraryName": "view-design",
+      "libraryDirectory": "src/components"
+    }],
+    "transform-vue-jsx"
+  ],
+  "ignore": [
+    // "src/modules/worker/index.js"
+  ],
+  "comments": false
+}

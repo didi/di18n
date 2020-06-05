@@ -1,0 +1,21 @@
+module.exports = {
+  entry: ['src'],
+  exclude: [],
+  output: ['src'],
+  disableAutoTranslate: true,
+  translator: null,
+  ignoreComponents: [],
+  ignoreMethods: [],
+  primaryLocale: 'zh-CN',
+  supportedLocales: ['zh-CN', 'en-US'],
+  importCode: '',
+  i18nObject: 'this',
+  i18nMethod: '$t',
+  prettier: {
+    parser: 'babel',
+    singleQuote: true,
+    trailingComma: 'es5',
+    endOfLine: 'lf',
+  },
+  localeConf: { type: 'file', folder: 'locales' },
+};
