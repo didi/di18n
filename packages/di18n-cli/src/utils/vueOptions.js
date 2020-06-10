@@ -56,7 +56,7 @@ module.exports = {
     singleQuote: true,
     trailingComma: 'es5',
     endOfLine: 'lf',
-    semi: false
+    semi: false,
   },
 
   // i18n saving conf, <object>

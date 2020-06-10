@@ -32,7 +32,7 @@ export const intl = new VueIntl();
 export function getLocale(cookieLocaleKey) {
   if (cookieLocaleKey) _cookieLocaleKey = cookieLocaleKey;
 
-  let locale = Cookie.get(_cookieLocaleKey)
+  let locale = Cookie.get(_cookieLocaleKey);
   if (locale) return locale;
 
   locale = navigator.language || '';
