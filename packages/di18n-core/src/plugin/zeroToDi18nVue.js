@@ -270,6 +270,16 @@ function traversePug(node, allTranslatedWord, keysInUse, ignores) {
             keysInUse,
             attr.val
           );
+
+          if (attr.val[0] !== '"' && attr.val[0] !== "'") {
+            // 补上引号
+            if (attr.val.includes('"')) {
+              attr.val = `'${attr.val}'`;
+            } else {
+              attr.val = `"${attr.val}"`;
+            }
+          }
+
           attr.name = ':' + attr.name;
         } else if (attr.name.startsWith(':') || attr.name.startsWith('v-')) {
           attr.val = attr.val.replace(matchQuoteReg, match => {
