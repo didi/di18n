@@ -133,7 +133,10 @@ function getPlugin(
   return {
     ImportDeclaration(path) {
       const { node } = path;
-      if (['di18n-react'].indexOf(node.source.value) >= 0) {
+      if (
+        ['di18n-react'].indexOf(node.source.value) >= 0 ||
+        ['di18n-vue'].indexOf(node.source.value) >= 0
+      ) {
         outObj.hasReactIntlUniversal = true;
       }
       path.skip();

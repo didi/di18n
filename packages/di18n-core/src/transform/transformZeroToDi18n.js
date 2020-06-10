@@ -37,7 +37,7 @@ function transformVue(
   option
 ) {
   const { filePath, currentEntry, currentOutput } = codeFileInfo;
-  const { ignoreComponents, ignoreMethods } = option;
+  const { ignoreComponents, ignoreMethods, importCode, i18nObject, i18nMethod } = option;
 
   let outObj = {
     hasReactIntlUniversal: false,
@@ -52,6 +52,9 @@ function transformVue(
     keysInUse,
     ignoreComponents,
     ignoreMethods,
+    importCode,
+    i18nObject,
+    i18nMethod,
   });
 
   if (isRewritten) {

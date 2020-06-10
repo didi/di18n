@@ -170,11 +170,11 @@ module.exports = function _transformJs(
     sourceCode2
   );
 
-  code = removeSpecialCodeLine(code, placeHolders);
+  code = removeSpecialCodeLine(code, placeHolders).trim();
 
   if (outObj.translateWordsNum > 0) {
     if (!outObj.hasReactIntlUniversal) {
-      if (intlAlias && intlAlias !== 'this') {
+      if (intlAlias) {
         code = `import { intl as ${intlAlias} } from 'di18n-react';\n${code}`;
       } else {
         code = importCode + '\n' + code;

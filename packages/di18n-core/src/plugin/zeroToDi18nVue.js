@@ -374,6 +374,9 @@ function translateVue({
   keysInUse,
   ignoreComponents,
   ignoreMethods,
+  importCode,
+  i18nObject,
+  i18nMethod,
 }) {
   const {
     template,
@@ -399,12 +402,12 @@ function translateVue({
     updatedTranslatedWord,
     keysInUse,
     {
-      intlAlias: 'this',
-      ignoreComponents: ignoreComponents || [],
-      ignoreMethods: ignoreMethods || [],
-      importCode: '',
-      i18nObject: '',
-      i18nMethod: '$t',
+      intlAlias: '',
+      ignoreComponents,
+      ignoreMethods,
+      importCode,
+      i18nObject,
+      i18nMethod,
     }
   );
 
