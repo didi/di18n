@@ -38,15 +38,15 @@ module.exports = {
   supportedLocales: ['zh-CN', 'en-US'],
 
   // import codes, <string>
-  // e.g. "import { intl } from 'di18n-react';"
-  importCode: '',
+  // e.g. "import { intl } from 'di18n-vue';"
+  importCode: "import { intl } from 'di18n-vue';",
 
   // i18n object, <string>
   // e.g. 'intl'
-  i18nObject: 'this',
+  i18nObject: 'intl',
 
   // i18n method, <string>
-  // e.g. 't'
+  // e.g. '$t'
   i18nMethod: '$t',
 
   // prettier conf, <object>
@@ -56,6 +56,7 @@ module.exports = {
     singleQuote: true,
     trailingComma: 'es5',
     endOfLine: 'lf',
+    semi: false
   },
 
   // i18n saving conf, <object>
