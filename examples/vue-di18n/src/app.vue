@@ -9,21 +9,24 @@ div(class="app")
     // di18n-enable
     button(@click="changeLocale('en-US')") English
   p {{$t('中文')}}
+  p {{haha}}
 </template>
 
 <script>
+import { intl, setLocale } from 'di18n-vue'
 import Logo from './EFE-logo.png'
 
 export default {
   name: 'app',
   data() {
     return {
-      logo: Logo
+      logo: Logo,
+      haha: intl.$t('哈哈')
     }
   },
   methods: {
     changeLocale(locale) {
-      this.$i18n.locale = locale
+      setLocale(locale, true)
     }
   }
 }

@@ -9,7 +9,7 @@
     "test": "cross-env NODE_ENV=testing webpack --config build/webpack.build.conf.js",
     "lint": "eslint --ext .vue --ext .js src/ --fix",
     "analyz": "npm_config_report=true npm run prod",
-    "di18n:init": "di18n init",
+    "di18n:init": "di18n init --vue",
     "di18n:sync": "di18n sync"
   },
   "files": [
@@ -18,7 +18,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "di18n-cli": "^0.1.0",
+    "di18n-vue": "^0.1.3",
     "vue": "^2.6.11",
     "vue-i18n": "^8.17.4"
   },
@@ -38,6 +38,7 @@
     "clean-webpack-plugin": "^3.0.0",
     "cross-env": "^7.0.2",
     "css-loader": "^3.4.2",
+    "di18n-cli": "^0.1.3",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.20.1",

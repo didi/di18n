@@ -8,14 +8,15 @@ module.exports = {
   ignoreMethods: [],
   primaryLocale: 'zh-CN',
   supportedLocales: ['zh-CN', 'en-US'],
-  importCode: '',
-  i18nObject: 'this',
+  importCode: "import { intl } from 'di18n-vue';",
+  i18nObject: 'intl',
   i18nMethod: '$t',
   prettier: {
     parser: 'babel',
     singleQuote: true,
     trailingComma: 'es5',
     endOfLine: 'lf',
+    semi: false,
   },
   localeConf: { type: 'file', folder: 'locales' },
 };
