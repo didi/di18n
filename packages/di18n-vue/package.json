@@ -1,0 +1,25 @@
+{
+  "name": "di18n-vue",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "scripts": {
+    "build": "umi-lib build"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [],
+  "author": "",
+  "dependencies": {
+    "js-cookie": "^2.2.1",
+    "vue-i18n": "^8.18.2"
+  },
+  "devDependencies": {
+    "umi": "^3.0.7",
+    "umi-library": "^1.2.0",
+    "umi-test": "^1.4.4"
+  },
+  "license": "MIT"
+}
