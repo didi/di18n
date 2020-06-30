@@ -24,6 +24,7 @@
     "@vitalets/google-translate-api": "^2.7.0",
     "chalk": "^3.0.0",
     "glob": "^7.1.6",
+    "mustache": "^4.0.1",
     "parse5": "^5.1.1",
     "prettier": "^1.19.1",
     "pug-lexer": "^4.1.0",

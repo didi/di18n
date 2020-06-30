@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const vuePlugin = require('../plugin/zeroToDi18nVue');
-const _transformJs = require('./_transformJs');
+const prettier = require('prettier');
+const transformTs = require('./transformTs');
+const transformJs = require('./transformJs');
+const transformVue = require('./transformVue');
 const log = require('../utils/log');
 
 function transformReact(
@@ -15,13 +17,18 @@ function transformReact(
   const sourceCode = fs.readFileSync(filePath, 'utf8');
   const isTSX = ['.ts', '.tsx'].includes(path.extname(filePath));
 
-  const code = _transformJs(
+  const transform = isTSX ? transformTs : transformJs;
+
+  const { source } = transform(
     sourceCode,
-    allTranslatedWord,
-    updatedTranslatedWord,
-    keysInUse,
-    { ...option, isTSX }
+    {
+      allTranslated: allTranslatedWord,
+      allUpdated: updatedTranslatedWord,
+      allUsedKeys: keysInUse
+    }
   );
+
+  const code = prettier.format(source, { ...option.prettier, parser: 'babel' });
 
   const target = currentOutput
     ? filePath.replace(currentEntry, currentOutput)
@@ -29,7 +36,7 @@ function transformReact(
   fs.writeFileSync(target, code, { encoding: 'utf-8' });
 }
 
-function transformVue(
+function transformVueAdapter(
   codeFileInfo,
   allTranslatedWord,
   updatedTranslatedWord,
@@ -37,33 +44,23 @@ function transformVue(
   option
 ) {
   const { filePath, currentEntry, currentOutput } = codeFileInfo;
-  const { ignoreComponents, ignoreMethods, importCode, i18nObject, i18nMethod } = option;
+  const sourceCode = fs.readFileSync(filePath, 'utf8');
 
-  let outObj = {
-    hasReactIntlUniversal: false,
-    translateWordsNum: 0,
-    keysInUse: keysInUse,
-  };
+  const { source } = transformVue(
+    sourceCode,
+    {
+      allTranslated: allTranslatedWord,
+      allUpdated: updatedTranslatedWord,
+      allUsedKeys: keysInUse
+    }
+  );
 
-  const { code, isRewritten } = vuePlugin({
-    filePath,
-    allTranslatedWord,
-    updatedTranslatedWord,
-    keysInUse,
-    ignoreComponents,
-    ignoreMethods,
-    importCode,
-    i18nObject,
-    i18nMethod,
-  });
+  const code = prettier.format(source, { ...option.prettier, parser: 'vue' });
 
-  if (isRewritten) {
-    const target = currentOutput
-      ? filePath.replace(currentEntry, currentOutput)
-      : filePath;
-    fs.writeFileSync(target, code, { encoding: 'utf-8' });
-    log.success(`done: ${outObj.translateWordsNum} words collected`);
-  }
+  const target = currentOutput
+    ? filePath.replace(currentEntry, currentOutput)
+    : filePath;
+  fs.writeFileSync(target, code, { encoding: 'utf-8' });
 }
 
 /**
@@ -82,7 +79,7 @@ module.exports = function transformZeroToDi18n(
   option
 ) {
   const { ext } = codeFileInfo;
-  const doTransform = ext === '.vue' ? transformVue : transformReact;
+  const doTransform = ext === '.vue' ? transformVueAdapter : transformReact;
   log.info(codeFileInfo.filePath);
   doTransform(
     codeFileInfo,
