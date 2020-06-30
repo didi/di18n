@@ -34,8 +34,7 @@ function toPascal(tpl, pkMap = {}) {
 function traverseHtml(ast, {
   primaryRegx,
   i18nMethod,
-  ignoreLines,
-  pkMap,
+  ignoreLines
 }, returns) {
   const { allTranslated, allUpdated, allUsedKeys } = returns;
   const existValues = Object.keys(allTranslated);
@@ -206,10 +205,10 @@ module.exports = function transformHtml(source, localeInfo = {}, options = {}) {
 
   opts.ignoreLines = getIgnoreLines(source);
 
-  const ast = parse5.parse(toKebab(source), { sourceCodeLocationInfo: true });
+  const ast = parse5.parse(toKebab(source, pkMap), { sourceCodeLocationInfo: true });
   traverseHtml(ast, opts, r);
 
-  let code = toPascal(parse5.serialize(ast))
+  let code = toPascal(parse5.serialize(ast), pkMap)
 
   // 只需要 body 内的
   code = code.split('<body>')[1].split('</body>')[0];
