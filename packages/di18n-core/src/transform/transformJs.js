@@ -153,7 +153,7 @@ function makeVisitor({
     }
 
     return t.callExpression(
-      t.identifier(i18nObject),
+      t.identifier(i18nMethod),
       objExp ? [v, objExp] : [v]
     );
   }

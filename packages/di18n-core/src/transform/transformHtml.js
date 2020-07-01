@@ -190,7 +190,7 @@ module.exports = function transformHtml(source, localeInfo = {}, options = {}) {
     babelPlugins = [],
     ignoreComponents = [],
     ignoreMethods = [],
-    * 以上暂时不需要 */
+    以上暂时不需要 */
   } = options;
 
   const opts = {
