@@ -38,19 +38,19 @@ module.exports = function transformVue(source, localeInfo = {}, options = {}) {
   const {
     allTranslated = {},
     allUpdated = {},
-    allUsedKeys =[]
+    allUsedKeys = [],
   } = localeInfo;
 
   const {
     primaryRegx = /[\u4e00-\u9fa5]/,
-    i18nObject ='intl',
+    i18nObject = 'intl',
     i18nMethod = '$t',
     importCode = "import { intl } from 'di18n-vue';",
     babelPresets = [],
     babelPlugins = [],
     ignoreComponents = [],
     ignoreMethods = [],
-    pkMap = {}
+    pkMap = {},
   } = options;
 
   const sfc = compiler.parseComponent(source, {
@@ -71,7 +71,7 @@ module.exports = function transformVue(source, localeInfo = {}, options = {}) {
       {
         allTranslated,
         allUpdated,
-        allUsedKeys
+        allUsedKeys,
       },
       {
         primaryRegx,
@@ -82,7 +82,7 @@ module.exports = function transformVue(source, localeInfo = {}, options = {}) {
         babelPlugins,
         ignoreComponents,
         ignoreMethods,
-        pkMap
+        pkMap,
       }
     );
 
@@ -98,7 +98,7 @@ module.exports = function transformVue(source, localeInfo = {}, options = {}) {
     {
       allTranslated,
       allUpdated,
-      allUsedKeys
+      allUsedKeys,
     },
     {
       primaryRegx,
@@ -108,7 +108,7 @@ module.exports = function transformVue(source, localeInfo = {}, options = {}) {
       babelPresets,
       babelPlugins,
       ignoreComponents,
-      ignoreMethods
+      ignoreMethods,
     }
   );
 

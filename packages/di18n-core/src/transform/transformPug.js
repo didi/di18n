@@ -2,7 +2,7 @@ const lex = require('pug-lexer');
 const parse = require('pug-parser');
 const genSource = require('pug-source-gen');
 const mustache = require('mustache');
-const prettier = require('prettier')
+const prettier = require('prettier');
 const transformJs = require('./transformJs');
 const getIgnoreLines = require('../utils/getIgnoreLines');
 
@@ -59,8 +59,8 @@ genSource.CodeGenerator.prototype.attrs = function(attrs) {
 function traversePug(ast, {
   primaryRegx,
   i18nMethod,
-  ignoreLines
-}, returns) { //returesallTranslatedWord, updatedTranslatedWord, keysInUse, ignores) {
+  ignoreLines,
+}, returns) { // returesallTranslatedWord, updatedTranslatedWord, keysInUse, ignores) {
   const { allTranslated, allUpdated, allUsedKeys } = returns;
   const existValues = Object.keys(allTranslated);
 
@@ -74,11 +74,11 @@ function traversePug(ast, {
 
   function formatValue(value) {
     // 去掉首尾空白字符，中间的连续空白字符替换成一个空格
-    value = value.trim().replace(/\s+/g, ' ')
-    
+    value = value.trim().replace(/\s+/g, ' ');
+
     // 去掉首尾引号
     if (['"', "'"].includes(value.charAt(0))) {
-      value = value.substring(1, value.length - 1)
+      value = value.substring(1, value.length - 1);
     }
 
     return value;
@@ -106,13 +106,13 @@ function traversePug(ast, {
       {
         allTranslated,
         allUpdated,
-        allUsedKeys
+        allUsedKeys,
       },
       {
         primaryRegx,
         i18nObject: '',
         i18nMethod,
-        importCode: ''
+        importCode: '',
       }
     );
 
@@ -121,7 +121,7 @@ function traversePug(ast, {
     return prettier.format(source1, {
       parser: 'babel',
       singleQuote: true,
-      semi: false
+      semi: false,
     }).trim();
   }
 
@@ -150,7 +150,7 @@ function traversePug(ast, {
           }
 
           // 引号里是 js 表达式，直接调用 transformJs 来转换
-          const source  = transformJsExpression(value);
+          const source = transformJsExpression(value);
 
           attr.val = `"${source}"`;
         } else {
@@ -161,7 +161,7 @@ function traversePug(ast, {
             key = allUpdated[key];
           }
 
-          attr.val = `"${i18nMethod}('${key}')"`
+          attr.val = `"${i18nMethod}('${key}')"`;
           attr.name = `:${name}`;
 
           returns.hasTouch = true;
@@ -181,7 +181,7 @@ function traversePug(ast, {
         // token 结构：[类型(text|name), 值, 起始位置(包含), 终止位置(不包含)]
         if (!isPrimary(token[1])) {
           if (token[0] === 'text') value += token[1];
-          else if (token[0] === 'name') value += `{{${token[1]}}}`
+          else if (token[0] === 'name') value += `{{${token[1]}}}`;
         } else {
           if (token[0] === 'text') {
             const key = token[1].trim();
@@ -189,7 +189,7 @@ function traversePug(ast, {
 
             updateLocaleInfo(key, key);
           } else if (token[0] === 'name') {
-            value += `{{${transformJsExpression(token[1])}}}`
+            value += `{{${transformJsExpression(token[1])}}}`;
           }
         }
       }
@@ -206,31 +206,34 @@ module.exports = function transformPug(source, localeInfo = {}, options = {}) {
   const {
     allTranslated = {},
     allUpdated = {},
-    allUsedKeys =[]
+    allUsedKeys = [],
   } = localeInfo;
 
   const {
     primaryRegx = /[\u4e00-\u9fa5]/,
-    i18nObject ='',
     i18nMethod = '$t',
+
+    /* 以下暂时不需要
+    i18nObject = '',
     importCode = '',
     babelPresets = [],
     babelPlugins = [],
     ignoreComponents = [],
-    ignoreMethods = []
+    ignoreMethods = [],
+    以上暂时不需要 */
   } = options;
 
   const opts = {
     primaryRegx,
     i18nMethod,
-    ignoreLines: []
+    ignoreLines: [],
   };
 
   const r = {
     allTranslated,
     allUpdated,
     allUsedKeys,
-    hasTouch: false
+    hasTouch: false,
   };
 
   opts.ignoreLines = getIgnoreLines(source);

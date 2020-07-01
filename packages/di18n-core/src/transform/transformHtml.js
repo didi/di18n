@@ -12,7 +12,7 @@ function toKebab(tpl, pkMap = {}) {
     tpl = (
       tpl
         .replace(new RegExp(`<${i}(?!-)`, 'g'), `<${pkMap[i]}`)
-        .replace(new RegExp(`<\/${i}>`, 'g'), `<\/${pkMap[i]}>`)
+        .replace(new RegExp(`</${i}>`, 'g'), `</${pkMap[i]}>`)
     );
   });
   return tpl;
@@ -34,15 +34,15 @@ function toPascal(tpl, pkMap = {}) {
 function traverseHtml(ast, {
   primaryRegx,
   i18nMethod,
-  ignoreLines
+  ignoreLines,
 }, returns) {
   const { allTranslated, allUpdated, allUsedKeys } = returns;
   const existValues = Object.keys(allTranslated);
 
   function shouldIgnore(node) {
     return (
-      node.sourceCodeLocation &&
-      ignoreLines.includes(node.sourceCodeLocation.startLine)
+      node.sourceCodeLocation
+      && ignoreLines.includes(node.sourceCodeLocation.startLine)
     );
   }
 
@@ -52,11 +52,11 @@ function traverseHtml(ast, {
 
   function formatValue(value) {
     // 去掉首尾空白字符，中间的连续空白字符替换成一个空格
-    value = value.trim().replace(/\s+/g, ' ')
-    
+    value = value.trim().replace(/\s+/g, ' ');
+
     // 去掉首尾引号
     if (['"', "'"].includes(value.charAt(0))) {
-      value = value.substring(1, value.length - 1)
+      value = value.substring(1, value.length - 1);
     }
 
     return value;
@@ -84,13 +84,13 @@ function traverseHtml(ast, {
       {
         allTranslated,
         allUpdated,
-        allUsedKeys
+        allUsedKeys,
       },
       {
         primaryRegx,
         i18nObject: '',
         i18nMethod,
-        importCode: ''
+        importCode: '',
       }
     );
 
@@ -99,7 +99,7 @@ function traverseHtml(ast, {
     return prettier.format(source1, {
       parser: 'babel',
       singleQuote: true,
-      semi: false
+      semi: false,
     }).trim();
   }
 
@@ -119,7 +119,7 @@ function traverseHtml(ast, {
         if (name.startsWith('v-') || name.startsWith(':') || name.startsWith('@')) {
           // vue 指令
           // 引号里是 js 表达式，直接调用 transformJs 来转换
-          const source  = transformJsExpression(value);
+          const source = transformJsExpression(value);
 
           attr.value = source;
         } else {
@@ -130,7 +130,7 @@ function traverseHtml(ast, {
             key = allUpdated[key];
           }
 
-          attr.value = `${i18nMethod}('${key}')`
+          attr.value = `${i18nMethod}('${key}')`;
           attr.name = `:${name}`;
 
           returns.hasTouch = true;
@@ -150,7 +150,7 @@ function traverseHtml(ast, {
         // token 结构：[类型(text|name), 值, 起始位置(包含), 终止位置(不包含)]
         if (!isPrimary(token[1])) {
           if (token[0] === 'text') value += token[1];
-          else if (token[0] === 'name') value += `{{${token[1]}}}`
+          else if (token[0] === 'name') value += `{{${token[1]}}}`;
         } else {
           if (token[0] === 'text') {
             const key = token[1].trim();
@@ -158,7 +158,7 @@ function traverseHtml(ast, {
 
             updateLocaleInfo(key, key);
           } else if (token[0] === 'name') {
-            value += `{{${transformJsExpression(token[1])}}}`
+            value += `{{${transformJsExpression(token[1])}}}`;
           }
         }
       }
@@ -175,32 +175,35 @@ module.exports = function transformHtml(source, localeInfo = {}, options = {}) {
   const {
     allTranslated = {},
     allUpdated = {},
-    allUsedKeys =[]
+    allUsedKeys = [],
   } = localeInfo;
 
   const {
     primaryRegx = /[\u4e00-\u9fa5]/,
-    i18nObject ='',
     i18nMethod = '$t',
+    pkMap = {},
+
+    /* 以下暂时不需要
+    i18nObject = '',
     importCode = '',
     babelPresets = [],
     babelPlugins = [],
     ignoreComponents = [],
     ignoreMethods = [],
-    pkMap = {}
+    * 以上暂时不需要 */
   } = options;
 
   const opts = {
     primaryRegx,
     i18nMethod,
-    ignoreLines: []
+    ignoreLines: [],
   };
 
   const r = {
     allTranslated,
     allUpdated,
     allUsedKeys,
-    hasTouch: false
+    hasTouch: false,
   };
 
   opts.ignoreLines = getIgnoreLines(source);
@@ -208,7 +211,7 @@ module.exports = function transformHtml(source, localeInfo = {}, options = {}) {
   const ast = parse5.parse(toKebab(source, pkMap), { sourceCodeLocationInfo: true });
   traverseHtml(ast, opts, r);
 
-  let code = toPascal(parse5.serialize(ast), pkMap)
+  let code = toPascal(parse5.serialize(ast), pkMap);
 
   // 只需要 body 内的
   code = code.split('<body>')[1].split('</body>')[0];
@@ -216,4 +219,4 @@ module.exports = function transformHtml(source, localeInfo = {}, options = {}) {
   code = r.hasTouch ? code : source;
 
   return { source: code, hasTouch: r.hasTouch };
-}
+};

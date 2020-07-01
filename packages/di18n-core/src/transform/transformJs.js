@@ -61,7 +61,7 @@ function makeVisitor({
   importCode,
   ignoreLines,
   ignoreMethods,
-  ignoreComponents
+  ignoreComponents,
 }, returns) {
   const { allTranslated, allUpdated, allUsedKeys } = returns;
   const existValues = Object.keys(allTranslated);
@@ -70,7 +70,7 @@ function makeVisitor({
   // XXX: [TRICKY] 防止中文转码为 unicode
   function hackValue(value, key) {
     if (key) hacked[key] = true;
-  
+
     return Object.assign(t.StringLiteral(value), {
       extra: {
         raw: `'${value}'`,
@@ -169,7 +169,7 @@ function makeVisitor({
 
     TemplateLiteral(path) {
       const { node } = path;
-  
+
       if (!shouldIgnore(node)) {
         const tempArr = [...node.quasis, ...node.expressions];
         tempArr.sort((a, b) => a.start - b.start);
@@ -212,9 +212,7 @@ function makeVisitor({
       const { value } = node;
 
       if (!shouldIgnore(node) && isPrimary(node.value)) {
-        const key = value + node.start + node.end;
-
-        switch(path.parent.type) {
+        switch (path.parent.type) {
           case 'ObjectProperty':
           case 'AssignmentExpression':
             path.replaceWith(
@@ -275,17 +273,17 @@ function makeVisitor({
       }
 
       if (node.callee.type === 'MemberExpression') {
-        const { object, property } = node.callee; 
+        const { object, property } = node.callee;
 
         if (
-          (object.name === i18nObject || object.type === 'ThisExpression') &&
-          property.name === i18nMethod
+          (object.name === i18nObject || object.type === 'ThisExpression')
+          && property.name === i18nMethod
         ) {
           // 收集现有的 key
           const args = node.arguments;
           const hasContext = args[1] && typeof args[1].value === 'string';
 
-          const key = args[0].value;
+          let key = args[0].value;
           let variable = null;
 
           if (hasContext) {
@@ -341,12 +339,12 @@ function makeVisitor({
           path.skip();
           return;
         }
+      }
 
-        // 跳过 ignoreMethods 中配置的被忽略的方法名
-        if (node.callee.type === 'Identifier') {
-          if (ignoreMethods.includes(node.callee.name)) {
-            path.skip();
-          }
+      // 跳过 ignoreMethods 中配置的被忽略的方法名
+      if (node.callee.type === 'Identifier') {
+        if (ignoreMethods.includes(node.callee.name)) {
+          path.skip();
         }
       }
     },
@@ -376,7 +374,7 @@ function makeVisitor({
             if (cur.type === 'JSXElement') {
               // 内部的文案加上标记，不再检测
               cur.children[0].ignore = true;
-              return prev+ formatWhitespace(`<${index}>${cur.children[0].value}</${index}>`);
+              return prev + formatWhitespace(`<${index}>${cur.children[0].value}</${index}>`);
             }
 
             console.error(`${cur.type} node are not supported in Di18nTrans`);
@@ -403,7 +401,7 @@ function makeVisitor({
       }
 
       path.skip();
-    }
+    },
   };
 }
 
@@ -411,18 +409,18 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
   const {
     allTranslated = {},
     allUpdated = {},
-    allUsedKeys =[]
+    allUsedKeys = [],
   } = localeInfo;
 
   const {
     primaryRegx = /[\u4e00-\u9fa5]/,
-    i18nObject ='intl',
+    i18nObject = 'intl',
     i18nMethod = 't',
     importCode = "import { intl } from 'di18n-react';",
     babelPresets = [],
     babelPlugins = [],
     ignoreComponents = [],
-    ignoreMethods = []
+    ignoreMethods = [],
   } = options;
 
   const transformOptions = {
@@ -440,7 +438,7 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
       pluginSyntaxDynamicImport,
       pluginSyntaxExportExtensions,
       pluginSyntaxFunctionBind,
-      ...babelPlugins
+      ...babelPlugins,
     ],
   };
 
@@ -451,7 +449,7 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
     importCode,
     ignoreLines: [],
     ignoreMethods,
-    ignoreComponents
+    ignoreComponents,
   };
 
   const r = {
@@ -459,13 +457,13 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
     allUpdated,
     allUsedKeys,
     hasImport: false,
-    hasTouch: false
+    hasTouch: false,
   };
 
   const ast = babel.parseSync(source, transformOptions);
   opts.ignoreLines = getIgnoreLines(ast);
   const visitor = makeVisitor(opts, r);
-  
+
   traverse(ast, visitor);
 
   let { code } = generate(ast, { retainLines: true }, source);

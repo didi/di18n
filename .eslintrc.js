@@ -39,6 +39,7 @@ module.exports = {
     'no-console': 'off',
     'no-var': 'error',
     'no-constant-condition': 'off',
+    'no-case-declarations': 'off',
     'prefer-arrow-callback': ['off', {
       allowNamedFunctions: false,
       allowUnboundThis: true,

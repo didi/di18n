@@ -5,7 +5,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "dopublish": "npm run lint && npm run build && lerna publish",
-    "lint": "eslint packages",
+    "lint": "eslint packages --fix",
     "build": "lerna run build",
     "test": "jest",
     "docs:dev": "vuepress dev docs",

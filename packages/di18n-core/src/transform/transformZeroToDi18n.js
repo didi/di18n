@@ -24,8 +24,9 @@ function transformReact(
     {
       allTranslated: allTranslatedWord,
       allUpdated: updatedTranslatedWord,
-      allUsedKeys: keysInUse
-    }
+      allUsedKeys: keysInUse,
+    },
+    option
   );
 
   const code = prettier.format(source, { ...option.prettier, parser: 'babel' });
@@ -51,8 +52,9 @@ function transformVueAdapter(
     {
       allTranslated: allTranslatedWord,
       allUpdated: updatedTranslatedWord,
-      allUsedKeys: keysInUse
-    }
+      allUsedKeys: keysInUse,
+    },
+    option
   );
 
   const code = prettier.format(source, { ...option.prettier, parser: 'vue' });
