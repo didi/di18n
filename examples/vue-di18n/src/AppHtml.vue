@@ -1,34 +1,34 @@
-<template lang="pug">
-div(class="app")
-  img(:src="logo")
-  h1 Vue-di18n
-  p Happly coding here ~
-  div
-    // di18n-disable
-    button(@click="changeLocale('zh-CN')") 中文
-    // di18n-enable
-    button(@click="changeLocale('en-US')") English
-  p {{$t('中文')}}
-  p {{haha}}
-  p {{$t('啦啦啦呼呼')}}
-  div(class="app-html-container")
-    AppHtml
+<template>
+  <div class="app-html">
+    <img :src="logo" />
+    <h1>Vue-di18n</h1>
+    <p>Happly coding here ~</p>
+    <div>
+      <!-- di18n-disable -->
+      <button @click="changeLocale('zh-CN')">中文</button>
+      <!-- di18n-enable -->
+      <button @click="changeLocale('en-US')">English</button>
+    </div>
+    <p>{{ $t('中文中文哈哈') }}</p>
+    <p>{{ $t('嘻嘻哈哈嘻嘻') }}</p>
+    <p>{{ haha }}</p>
+    <Switch>{{ $t('汉子') }}</Switch>
+    <Circle>{{ $t('呼呼呼啦啦') }}</Circle>
+  </div>
 </template>
 
 <script>
 import { intl, setLocale } from 'di18n-vue'
-import AppHtml from './AppHtml'
 import Logo from './EFE-logo.png'
 
 export default {
-  name: 'app',
+  name: 'app-html',
   data() {
     return {
       logo: Logo,
       haha: intl.$t('哈哈'),
     }
   },
-  components: { AppHtml },
   methods: {
     changeLocale(locale) {
       setLocale(locale, true)

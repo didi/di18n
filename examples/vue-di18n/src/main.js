@@ -10,8 +10,8 @@ const i18n = new VueI18n({
   locale: getLocale(),
   messages: {
     'zh-CN': zhCN,
-    'en-US': enUS
-  }
+    'en-US': enUS,
+  },
 })
 
 intl.init(i18n)
@@ -20,5 +20,5 @@ intl.init(i18n)
 new Vue({
   el: '#root',
   i18n,
-  render: h => h(App)
+  render: h => h(App),
 })
