@@ -49,20 +49,23 @@ $ yarn add  -D di18n-cli
 
 ## 初始化
 
+**React**
+
 ```
 $ npx di18n init
 ```
 
-## 同步
+**Vue**
+
+```
+$ npx di18n init --vue
+```
+
+
+## 转换
 
 ```
 $ npx di18n sync
-```
-
-## 发布
-
-```
-$ npx di18n publish
 ```
 
 ## License
