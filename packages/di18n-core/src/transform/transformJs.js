@@ -278,59 +278,8 @@ function makeVisitor({
         return;
       }
 
+      // 处理 ignoreMethods
       if (node.callee.type === 'MemberExpression') {
-        const { object, property } = node.callee;
-
-        if (
-          (object.name === i18nObject || object.type === 'ThisExpression')
-          && property.name === i18nMethod
-        ) {
-          // 收集现有的 key
-          const args = node.arguments;
-          const hasContext = args[1] && typeof args[1].value === 'string';
-
-          let key = args[0].value;
-          let variable = null;
-
-          if (hasContext) {
-            // 附加上 context
-            key += `{context, ${args[1].value}}`;
-            variable = args[2];
-          } else {
-            variable = args[1];
-          }
-
-          if (allUpdated.hasOwnProperty(key)) {
-            // 如果对应的中文已经在远端被修改，则自动更新代码
-            path.replaceWith(
-              makeReplace(allUpdated[key], variable)
-            );
-          } else {
-            if (Array.isArray(node.arguments) && node.arguments.length > 0) {
-              if (!allUsedKeys.includes(key)) {
-                allUsedKeys.push(key);
-              }
-
-              const { value } = node.arguments[0];
-
-              if (!existValues.includes(value)) {
-                if (hasContext) {
-                  allTranslated[value] = ['', key];
-                } else {
-                  allTranslated[value] = [key];
-                }
-                existValues.push(value);
-              } else if (!allTranslated[value].includes(key)) {
-                allTranslated[value].push(key);
-              }
-            }
-          }
-
-          path.skip();
-          return;
-        }
-
-        // 处理 ignoreMethods
         let parentNode = '';
         if (node.callee.object.name) {
           parentNode = node.callee.object.name;
@@ -347,11 +296,67 @@ function makeVisitor({
         }
       }
 
-      // 跳过 ignoreMethods 中配置的被忽略的方法名
       if (node.callee.type === 'Identifier') {
         if (ignoreMethods.includes(node.callee.name)) {
           path.skip();
+          return;
         }
+      }
+
+      // 可能需要更新 key
+      if (
+        (
+          node.callee.type === 'MemberExpression'
+          && node.callee.object.name === i18nObject
+          && node.callee.property.name === i18nMethod
+        )
+        || (
+          node.callee.type === 'Identifier'
+          && node.callee.name === i18nMethod
+        )
+      ) {
+        // 收集现有的 key
+        const args = node.arguments;
+        const hasContext = args[1] && typeof args[1].value === 'string';
+
+        let key = args[0].value;
+        let variable = null;
+
+        if (hasContext) {
+          // 附加上 context
+          key += `{context, ${args[1].value}}`;
+          variable = args[2];
+        } else {
+          variable = args[1];
+        }
+
+        if (allUpdated.hasOwnProperty(key)) {
+          // 如果对应的中文已经在远端被修改，则自动更新代码
+          path.replaceWith(
+            makeReplace(allUpdated[key], variable)
+          );
+        } else {
+          if (Array.isArray(node.arguments) && node.arguments.length > 0) {
+            if (!allUsedKeys.includes(key)) {
+              allUsedKeys.push(key);
+            }
+
+            const { value } = node.arguments[0];
+
+            if (!existValues.includes(value)) {
+              if (hasContext) {
+                allTranslated[value] = ['', key];
+              } else {
+                allTranslated[value] = [key];
+              }
+              existValues.push(value);
+            } else if (!allTranslated[value].includes(key)) {
+              allTranslated[value].push(key);
+            }
+          }
+        }
+
+        path.skip();
       }
     },
 

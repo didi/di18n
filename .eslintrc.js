@@ -143,7 +143,7 @@ module.exports = {
       anonymous: 'ignore',
       named: 'never',
     }],
-    'complexity': ['error', { max: 20 }],
+    'complexity': ['warn', { max: 25 }],
     'no-shadow': 'off',
     'no-await-in-loop': 'off',
     'comma-dangle': [

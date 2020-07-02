@@ -113,7 +113,7 @@ module.exports = function transformVue(source, localeInfo = {}, options = {}) {
   );
 
   script.content = ret.source;
-  hasTouch = ret.hasTouch;
+  hasTouch = hasTouch || ret.hasTouch;
 
   const code = combineVue(template, script, styles, customBlocks);
 

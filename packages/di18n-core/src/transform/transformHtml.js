@@ -165,7 +165,7 @@ function traverseHtml(ast, {
 
       if (node.value !== value) {
         node.value = value;
-        returns.touch = true;
+        returns.hasTouch = true;
       }
     }
   }
