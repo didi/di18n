@@ -86,9 +86,6 @@ function traversePug(ast, {
 
   // 更新2个 `all*` 数组
   function updateLocaleInfo(key, value) {
-    // 存在文案替换
-    returns.hasTouch = true;
-
     if (!Array.isArray(allTranslated[value])) {
       // 如果该文字没有存在于已翻译列表
       allTranslated[value] = [key];
@@ -116,7 +113,7 @@ function traversePug(ast, {
       }
     );
 
-    if (hasTouch) returns.hasTouch = true;
+    if (!hasTouch) return source;
 
     return prettier.format(source1, {
       parser: 'babel',
@@ -152,7 +149,10 @@ function traversePug(ast, {
           // 引号里是 js 表达式，直接调用 transformJs 来转换
           const source = transformJsExpression(value);
 
-          attr.val = `"${source}"`;
+          if (source !== val) {
+            attr.val = `"${source}"`;
+            returns.hasTouch = true;
+          }
         } else {
           // 普通属性（应该不会有人在模板里写 onclick 等事件吧，故不考虑事件）
           let key = formatValue(val);
@@ -163,9 +163,7 @@ function traversePug(ast, {
 
           attr.val = `"${i18nMethod}('${key}')"`;
           attr.name = `:${name}`;
-
           returns.hasTouch = true;
-          updateLocaleInfo(key, key);
         }
       });
     }
@@ -189,12 +187,16 @@ function traversePug(ast, {
 
             updateLocaleInfo(key, key);
           } else if (token[0] === 'name') {
-            value += `{{${transformJsExpression(token[1])}}}`;
+            const source = transformJsExpression(token[1]);
+            value += `{{${source}}}`;
           }
         }
       }
 
-      node.val = value;
+      if (node.val !== value) {
+        node.val = value;
+        returns.hasTouch = true;
+      }
     }
   }
 

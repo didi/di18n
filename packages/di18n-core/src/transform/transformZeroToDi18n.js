@@ -19,7 +19,7 @@ function transformReact(
 
   const transform = isTSX ? transformTs : transformJs;
 
-  const { source } = transform(
+  const { source, hasTouch } = transform(
     sourceCode,
     {
       allTranslated: allTranslatedWord,
@@ -29,12 +29,14 @@ function transformReact(
     option
   );
 
-  const code = prettier.format(source, { ...option.prettier, parser: 'babel' });
+  if (hasTouch) {
+    const code = prettier.format(source, { ...option.prettier, parser: 'babel' });
 
-  const target = currentOutput
-    ? filePath.replace(currentEntry, currentOutput)
-    : filePath;
-  fs.writeFileSync(target, code, { encoding: 'utf-8' });
+    const target = currentOutput
+      ? filePath.replace(currentEntry, currentOutput)
+      : filePath;
+    fs.writeFileSync(target, code, { encoding: 'utf-8' });
+  }
 }
 
 function transformVueAdapter(
@@ -47,7 +49,7 @@ function transformVueAdapter(
   const { filePath, currentEntry, currentOutput } = codeFileInfo;
   const sourceCode = fs.readFileSync(filePath, 'utf8');
 
-  const { source } = transformVue(
+  const { source, hasTouch } = transformVue(
     sourceCode,
     {
       allTranslated: allTranslatedWord,
@@ -57,12 +59,14 @@ function transformVueAdapter(
     option
   );
 
-  const code = prettier.format(source, { ...option.prettier, parser: 'vue' });
+  if (hasTouch) {
+    const code = prettier.format(source, { ...option.prettier, parser: 'vue' });
 
-  const target = currentOutput
-    ? filePath.replace(currentEntry, currentOutput)
-    : filePath;
-  fs.writeFileSync(target, code, { encoding: 'utf-8' });
+    const target = currentOutput
+      ? filePath.replace(currentEntry, currentOutput)
+      : filePath;
+    fs.writeFileSync(target, code, { encoding: 'utf-8' });
+  }
 }
 
 /**

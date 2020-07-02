@@ -114,9 +114,6 @@ function makeVisitor({
 
   // 更新2个 `all*` 数组
   function updateLocaleInfo(key, value) {
-    // 存在文案替换
-    returns.hasTouch = true;
-
     if (!Array.isArray(allTranslated[value])) {
       // 如果该文字没有存在于已翻译列表
       allTranslated[value] = [key];
@@ -131,6 +128,9 @@ function makeVisitor({
   }
 
   function makeReplace(value, variables) {
+    // 存在文案替换
+    returns.hasTouch = true;
+
     value = formatWhitespace(value);
 
     // 直接使用主语言（比如中文）做 key
@@ -161,7 +161,9 @@ function makeVisitor({
   return {
     ImportDeclaration(path) {
       // 已经导入过 di18n-react 或 di18n-vue 包
-      if (importCode.includes(path.node.source.value)) {
+      const m = importCode.match(/from ["'](.*)["']/);
+      const pkgName = m ? m[1] : '';
+      if (path.node.source.value === pkgName) {
         returns.hasImport = true;
       }
       path.skip();
@@ -170,7 +172,10 @@ function makeVisitor({
     TemplateLiteral(path) {
       const { node } = path;
 
-      if (!shouldIgnore(node)) {
+      if (
+        !shouldIgnore(node)
+        && node.quasis.some(word => isPrimary(word.value.cooked))
+      ) {
         const tempArr = [...node.quasis, ...node.expressions];
         tempArr.sort((a, b) => a.start - b.start);
 
@@ -237,12 +242,13 @@ function makeVisitor({
           case 'JSXAttribute':
             if (ignoreComponents.includes(path.parentPath.parent.name.name)) {
               // 过滤掉配置中 ignoreComponents 中指定的组件
-              const key = value + node.start + node.end;
-              if (!hacked[key]) {
-                path.replaceWith(
-                  hackValue(value, key)
-                );
-              }
+              // XXX: 以下应该是不需要的，先注释下个版本移除
+              // const key = value + node.start + node.end;
+              // if (!hacked[key]) {
+              //   path.replaceWith(
+              //     hackValue(value, key)
+              //   );
+              // }
             } else {
               path.replaceWith(
                 t.JSXExpressionContainer(

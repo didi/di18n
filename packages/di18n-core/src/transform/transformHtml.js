@@ -64,9 +64,6 @@ function traverseHtml(ast, {
 
   // 更新2个 `all*` 数组
   function updateLocaleInfo(key, value) {
-    // 存在文案替换
-    returns.hasTouch = true;
-
     if (!Array.isArray(allTranslated[value])) {
       // 如果该文字没有存在于已翻译列表
       allTranslated[value] = [key];
@@ -94,7 +91,7 @@ function traverseHtml(ast, {
       }
     );
 
-    if (hasTouch) returns.hasTouch = true;
+    if (!hasTouch) return source;
 
     return prettier.format(source1, {
       parser: 'babel',
@@ -121,7 +118,10 @@ function traverseHtml(ast, {
           // 引号里是 js 表达式，直接调用 transformJs 来转换
           const source = transformJsExpression(value);
 
-          attr.value = source;
+          if (value !== source) {
+            attr.value = source;
+            returns.hasTouch = true;
+          }
         } else {
           // 普通属性（不考虑事件）
           let key = formatValue(value);
@@ -132,8 +132,8 @@ function traverseHtml(ast, {
 
           attr.value = `${i18nMethod}('${key}')`;
           attr.name = `:${name}`;
-
           returns.hasTouch = true;
+
           updateLocaleInfo(key, key);
         }
       });
@@ -163,7 +163,10 @@ function traverseHtml(ast, {
         }
       }
 
-      node.value = value;
+      if (node.value !== value) {
+        node.value = value;
+        returns.touch = true;
+      }
     }
   }
 
