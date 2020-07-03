@@ -149,7 +149,7 @@ function traversePug(ast, {
           // 引号里是 js 表达式，直接调用 transformJs 来转换
           const source = transformJsExpression(value);
 
-          if (source !== val) {
+          if (`"${source}"` !== val) {
             attr.val = `"${source}"`;
             returns.hasTouch = true;
           }
