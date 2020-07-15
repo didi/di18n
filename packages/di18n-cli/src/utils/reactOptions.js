@@ -29,6 +29,8 @@ module.exports = {
   // e.g. ['MirrorTrack']
   ignoreMethods: [],
 
+  primaryRegx: /[\u4e00-\u9fa5]/,
+
   // primary locale, <string>
   // e.g. 'zh-CN'
   primaryLocale: 'zh-CN',
