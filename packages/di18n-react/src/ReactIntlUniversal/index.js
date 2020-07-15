@@ -302,7 +302,10 @@ class ReactIntlUniversal {
   }
 
   getLocaleFromBrowser() {
-    return navigator.language || navigator.userLanguage;
+    const lang = navigator.language || navigator.userLanguage;
+
+    // XXX: support other languages later
+    return lang.includes('en') ? 'en-US' : 'zh-CN';
   }
 }
 
