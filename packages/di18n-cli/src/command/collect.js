@@ -181,7 +181,7 @@ async function collectChineseWords(option, publish, confService) {
 
   Object.keys(zhData).forEach(k => {
     const chineseValue = zhData[k];
-    if (chineseValue.trim() !== k.replace(/\{context,\s*\S+\}$/, '')) {
+    if (chineseValue.trim() !== k.replace(/\{context,\s*\S+\}$/, '').trim()) {
       updatedTranslatedWord[k] = chineseValue;
     } else {
       if (Array.isArray(allTranslatedWord[chineseValue])) {
