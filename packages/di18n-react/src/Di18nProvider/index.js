@@ -53,7 +53,7 @@ export default class Di18nProvider extends React.Component {
 
     console.log('currentLocale', currentLocale);
 
-    currentLocale = langKeysMapping[locale] || currentLocale;
+    currentLocale = langKeysMapping[locale] || 'zh-CN';
 
     console.log('currentLocale', currentLocale);
 
