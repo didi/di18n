@@ -62,7 +62,7 @@ function makeVisitor({
   ignoreLines,
   ignoreMethods,
   ignoreComponents,
-  ignoreAttributes
+  ignoreAttributes,
 }, returns) {
   const { allTranslated, allUpdated, allUsedKeys } = returns;
   const existValues = Object.keys(allTranslated);
@@ -422,7 +422,7 @@ function makeVisitor({
       if (ignoreAttributes.includes(node.name.name)) {
         path.skip();
       }
-    }
+    },
   };
 }
 
@@ -442,7 +442,7 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
     babelPlugins = [],
     ignoreComponents = [],
     ignoreMethods = [],
-    ignoreAttributes = ['style', 'className']
+    ignoreAttributes = ['style', 'className'],
   } = options;
 
   const transformOptions = {
@@ -472,7 +472,7 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
     ignoreLines: [],
     ignoreMethods,
     ignoreComponents,
-    ignoreAttributes
+    ignoreAttributes,
   };
 
   const r = {

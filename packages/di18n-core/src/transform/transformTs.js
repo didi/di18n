@@ -17,7 +17,7 @@ module.exports = function transformTs(code, localeInfo = {}, options = {}) {
     babelPlugins = [],
     ignoreComponents = [],
     ignoreMethods = [],
-    ignoreAttributes = ['style', 'className']
+    ignoreAttributes = ['style', 'className'],
   } = options;
 
   return transformJs(
@@ -39,7 +39,7 @@ module.exports = function transformTs(code, localeInfo = {}, options = {}) {
       babelPlugins,
       ignoreComponents,
       ignoreMethods,
-      ignoreAttributes
+      ignoreAttributes,
     }
   );
 };
