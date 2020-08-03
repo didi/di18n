@@ -51,11 +51,7 @@ export default class Di18nProvider extends React.Component {
       });
     }
 
-    console.log('currentLocale', currentLocale);
-
-    currentLocale = langKeysMapping[locale] || 'zh-CN';
-
-    console.log('currentLocale', currentLocale);
+    currentLocale = langKeysMapping[locale] || currentLocale;
 
     if (!/^([a-z]{2})-([A-Z]{2})$/.test(currentLocale)) {
       console.warn('locale format error,  use format like zh-CN, but got ' + currentLocale);
