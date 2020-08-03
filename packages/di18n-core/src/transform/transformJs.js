@@ -62,6 +62,7 @@ function makeVisitor({
   ignoreLines,
   ignoreMethods,
   ignoreComponents,
+  ignoreAttributes
 }, returns) {
   const { allTranslated, allUpdated, allUsedKeys } = returns;
   const existValues = Object.keys(allTranslated);
@@ -413,6 +414,15 @@ function makeVisitor({
 
       path.skip();
     },
+
+    JSXAttribute(path) {
+      const { node } = path;
+
+      // 跳过被忽略的属性，比如 style、className 等
+      if (ignoreAttributes.includes(node.name.name)) {
+        path.skip();
+      }
+    }
   };
 }
 
@@ -432,6 +442,7 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
     babelPlugins = [],
     ignoreComponents = [],
     ignoreMethods = [],
+    ignoreAttributes = ['style', 'className']
   } = options;
 
   const transformOptions = {
@@ -461,6 +472,7 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
     ignoreLines: [],
     ignoreMethods,
     ignoreComponents,
+    ignoreAttributes
   };
 
   const r = {
