@@ -1,6 +1,6 @@
 {
   "name": "di18n-core",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
