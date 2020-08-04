@@ -3,6 +3,7 @@
   "version": "0.1.9",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
+  "typings": "index.d.ts",
   "scripts": {
     "doc:dev": "umi-lib doc dev",
     "doc:build": "umi-lib doc build",
@@ -13,7 +14,8 @@
     "test": "umi-test"
   },
   "files": [
-    "dist"
+    "dist",
+    "index.d.ts"
   ],
   "peerDependencies": {
     "react": "^16.0.0"
