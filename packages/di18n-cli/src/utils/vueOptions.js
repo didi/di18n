@@ -55,7 +55,7 @@ module.exports = {
   // prettier conf, <object>
   // e.g. {}
   prettier: {
-    parser: 'babel',
+    parser: 'vue',
     singleQuote: true,
     trailingComma: 'es5',
     endOfLine: 'lf',
