@@ -16,14 +16,14 @@
 di18n 会先按如下步骤扫描源码：
 
 - 使用 Babel 解析得到 AST，遍历 AST，并对特殊的节点进行检查，抽取出需要翻译的字符串；
-- 自动为每一个字符串分配一个 key；
+- ~~自动为每一个字符串分配一个 key~~ 因随机 key 可读性差，已改成使用主语言（如中文）文案为 key；
 - 自动调用 Google 翻译服务（可选），得到一个英文的字符串。
 
 > 注：对于 React，上面提到的特殊节点包括： `JSXText` `StringLiteral` `TemplateLiteral` 等。
 
 扫描之后，对于源代码：
 
-- 构造 `CallExpression` 表达式 `intl.get('key1').d('xxx');`；
+- 构造 `CallExpression` 表达式 `intl.t('key1')`；
 - 替换原有节点 `path.replaceWith(newNode)`；
 - 将新的 AST 通过 Babel 转换为代码；
 - 使用 Prettier 格式化代码；
@@ -54,6 +54,8 @@ $ yarn add  -D di18n-cli
 ```
 $ npx di18n init
 ```
+
+注意：`TypeScript` 需要将配置文件 di18n.config.js 的 `prettier.parser` 改为 `"typescript"`。
 
 **Vue**
 
