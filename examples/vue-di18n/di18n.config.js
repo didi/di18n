@@ -12,7 +12,7 @@ module.exports = {
   i18nObject: 'intl',
   i18nMethod: '$t',
   prettier: {
-    parser: 'babel',
+    parser: 'vue',
     singleQuote: true,
     trailingComma: 'es5',
     endOfLine: 'lf',

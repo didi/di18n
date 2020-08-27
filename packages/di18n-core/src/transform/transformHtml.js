@@ -110,8 +110,8 @@ function traverseHtml(ast, {
       node.attrs.forEach(attr => {
         const { name, value } = attr;
 
-        // 非主语言，跳过
-        if (!isPrimary(value)) return;
+        // 非主语言或空，跳过
+        if (!isPrimary(value) || !value) return;
 
         if (name.startsWith('v-') || name.startsWith(':') || name.startsWith('@')) {
           // vue 指令
@@ -170,8 +170,16 @@ function traverseHtml(ast, {
     }
   }
 
-  // 执行遍历
-  traverse(ast.childNodes[0].childNodes[1]);
+  // 可能有 #comment 节点，需要找到 html 节点
+  const html = ast.childNodes.find(nd => nd.nodeName === 'html');
+
+  if (html) {
+    // 再找 body 节点
+    const body = html.childNodes.find(nd => nd.nodeName === 'body');
+
+    // 遍历
+    if (body) traverse(body);
+  }
 }
 
 module.exports = function transformHtml(source, localeInfo = {}, options = {}) {
