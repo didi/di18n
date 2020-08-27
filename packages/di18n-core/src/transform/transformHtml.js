@@ -11,7 +11,7 @@ function toKebab(tpl, pkMap = {}) {
   Object.keys(pkMap).forEach(i => {
     tpl = (
       tpl
-        .replace(new RegExp(`<${i}(?!-)`, 'g'), `<${pkMap[i]}`)
+        .replace(new RegExp(`<${i}(?![a-zA-Z0-9-])`, 'g'), `<${pkMap[i]}`)
         .replace(new RegExp(`</${i}>`, 'g'), `</${pkMap[i]}>`)
     );
   });
@@ -24,7 +24,7 @@ function toPascal(tpl, pkMap = {}) {
   Object.keys(pkMap).forEach(i => {
     tpl = (
       tpl
-        .replace(new RegExp(`<${pkMap[i]}(?!-)`, 'g'), `<${i}`)
+        .replace(new RegExp(`<${pkMap[i]}(?![a-zA-Z0-9-])`, 'g'), `<${i}`)
         .replace(new RegExp(`</${pkMap[i]}>`, 'g'), `</${i}>`)
     );
   });
