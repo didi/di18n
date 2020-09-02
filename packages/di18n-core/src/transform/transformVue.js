@@ -30,7 +30,7 @@ function closeTag(sfcBlock) {
 
 function combineVue(template, script, sytles, customBlocks) {
   return [template, script, ...sytles, ...customBlocks]
-    .map(sfc => `${openTag(sfc)}\n${sfc.content.trim()}\n${closeTag(sfc)}\n`)
+    .map(sfc => sfc ? `${openTag(sfc)}\n${sfc.content.trim()}\n${closeTag(sfc)}\n` : '')
     .join('\n');
 }
 
@@ -59,15 +59,46 @@ module.exports = function transformVue(source, localeInfo = {}, options = {}) {
   });
 
   const { template, script, styles, customBlocks } = sfc;
-  const templateType = (template.lang || 'html').toLowerCase();
   let hasTouch = false;
+  
+  if (template) {
+    const templateType = (template.lang || 'html').toLowerCase();
 
-  // transform template
-  if (['html', 'pug'].includes(templateType)) {
-    const transform = templateType === 'html' ? transformHtml : transformPug;
+    // transform template
+    if (['html', 'pug'].includes(templateType)) {
+      const transform = templateType === 'html' ? transformHtml : transformPug;
 
-    const ret = transform(
-      template.content,
+      const ret = transform(
+        template.content,
+        {
+          allTranslated,
+          allUpdated,
+          allUsedKeys,
+        },
+        {
+          primaryRegx,
+          i18nObject: '',
+          i18nMethod,
+          importCode: '',
+          babelPresets,
+          babelPlugins,
+          ignoreComponents,
+          ignoreMethods,
+          pkMap,
+        }
+      );
+
+      template.content = ret.source;
+      hasTouch = ret.hasTouch;
+    } else {
+      console.warn(`Unsupport type: ${templateType}, so the template is ignored`);
+    }
+  }
+
+  // transform script
+  if (script) {
+    const ret = transformJs(
+      script.content,
       {
         allTranslated,
         allUpdated,
@@ -75,45 +106,19 @@ module.exports = function transformVue(source, localeInfo = {}, options = {}) {
       },
       {
         primaryRegx,
-        i18nObject: '',
+        i18nObject,
         i18nMethod,
-        importCode: '',
+        importCode,
         babelPresets,
         babelPlugins,
         ignoreComponents,
         ignoreMethods,
-        pkMap,
       }
     );
 
-    template.content = ret.source;
-    hasTouch = ret.hasTouch;
-  } else {
-    console.warn(`Unsupport type: ${templateType}, so the template is ignored`);
+    script.content = ret.source;
+    hasTouch = hasTouch || ret.hasTouch;
   }
-
-  // transform script
-  const ret = transformJs(
-    script.content,
-    {
-      allTranslated,
-      allUpdated,
-      allUsedKeys,
-    },
-    {
-      primaryRegx,
-      i18nObject,
-      i18nMethod,
-      importCode,
-      babelPresets,
-      babelPlugins,
-      ignoreComponents,
-      ignoreMethods,
-    }
-  );
-
-  script.content = ret.source;
-  hasTouch = hasTouch || ret.hasTouch;
 
   const code = combineVue(template, script, styles, customBlocks);
 
