@@ -55,7 +55,6 @@ module.exports = {
   // prettier conf, <object>
   // e.g. {}
   prettier: {
-    parser: 'babel', // 'typescript'
     singleQuote: true,
     trailingComma: 'es5',
     endOfLine: 'lf',
