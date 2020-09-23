@@ -448,6 +448,7 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
   const transformOptions = {
     sourceType: 'module',
     ast: true,
+    configFile: false,
     presets: babelPresets,
     plugins: [
       pluginSyntaxJSX,
