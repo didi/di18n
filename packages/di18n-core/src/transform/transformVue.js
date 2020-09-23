@@ -30,7 +30,7 @@ function closeTag(sfcBlock) {
 
 function combineVue(template, script, sytles, customBlocks) {
   return [template, script, ...sytles, ...customBlocks]
-    .map(sfc => sfc ? `${openTag(sfc)}\n${sfc.content.trim()}\n${closeTag(sfc)}\n` : '')
+    .map(sfc => (sfc ? `${openTag(sfc)}\n${sfc.content.trim()}\n${closeTag(sfc)}\n` : ''))
     .join('\n');
 }
 
@@ -60,7 +60,7 @@ module.exports = function transformVue(source, localeInfo = {}, options = {}) {
 
   const { template, script, styles, customBlocks } = sfc;
   let hasTouch = false;
-  
+
   if (template) {
     const templateType = (template.lang || 'html').toLowerCase();
 
