@@ -490,7 +490,9 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
 
   traverse(ast, visitor);
 
-  let { code } = generate(ast, { retainLines: true }, source);
+  // XXX: decorator bug
+  // https://stackoverflow.com/a/55478641
+  let { code } = generate(ast, { retainLines: false }, source);
 
   if (!r.hasTouch) {
     code = source;
