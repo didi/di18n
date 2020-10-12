@@ -1,9 +1,50 @@
 const parse5 = require('parse5');
+const Serializer = require('parse5/lib/serializer')
 const prettier = require('prettier');
 const mustache = require('mustache');
 const transformJs = require('./transformJs');
 const getIgnoreLines = require('../utils/getIgnoreLines');
 const defaultPkMap = require('./defaultPkMap');
+
+class MySerializer extends Serializer {
+  _serializeAttributes(node) {
+    const attrs = this.treeAdapter.getAttrList(node);
+
+    for (let i = 0, attrsLength = attrs.length; i < attrsLength; i++) {
+        const attr = attrs[i];
+        const value = Serializer.escapeString(attr.value, true);
+
+        this.html += ' ';
+
+        if (!attr.namespace) {
+            this.html += attr.name;
+        } else if (attr.namespace === NS.XML) {
+            this.html += 'xml:' + attr.name;
+        } else if (attr.namespace === NS.XMLNS) {
+            if (attr.name !== 'xmlns') {
+                this.html += 'xmlns:';
+            }
+
+            this.html += attr.name;
+        } else if (attr.namespace === NS.XLINK) {
+            this.html += 'xlink:' + attr.name;
+        } else {
+            this.html += attr.prefix + ':' + attr.name;
+        }
+
+        // 避免出现 <p v-else="">xxx</p> 的情况
+        if (value) {
+            this.html += '="' + value + '"';
+        }
+    }
+  }
+}
+
+function parse5Serialize(node, options) {
+  const serializer = new MySerializer(node, options);
+
+  return serializer.serialize();
+}
 
 function toKebab(tpl, pkMap = {}) {
   pkMap = { ...defaultPkMap, ...pkMap };
@@ -222,7 +263,7 @@ module.exports = function transformHtml(source, localeInfo = {}, options = {}) {
   const ast = parse5.parse(toKebab(source, pkMap), { sourceCodeLocationInfo: true });
   traverseHtml(ast, opts, r);
 
-  let code = toPascal(parse5.serialize(ast), pkMap);
+  let code = toPascal(parse5Serialize(ast), pkMap);
 
   // 只需要 body 内的
   code = code.split('<body>')[1].split('</body>')[0];
