@@ -63,25 +63,33 @@ async function syncOneNonChineseLocalesConf(
       if (disableAutoTranslate) {
         mergedLocales[k] = text;
       } else {
-        translateTasks.push(
-          translate(text, targetLang)
-            .then(res => {
-              mergedLocales[k] = res.text;
-            })
-            .catch(err => {
-              log.warning(`[AutoTranslate]: ${err.message}`);
-              mergedLocales[k] = text;
-            })
-        );
+        translateTasks.push([k, targetLang]);
       }
     }
   });
 
+  const total = translateTasks.length;
+
   // 控制并发数
   const concurrenceCount = 3;
+
   while (translateTasks.length > 0) {
     const tasks = translateTasks.splice(0, concurrenceCount);
-    await Promise.all(tasks);
+
+    await Promise.all(tasks.map(([k, targetLang]) => {
+      const text = mergedLocales[k];
+
+      return translate(text, targetLang)
+        .then(res => {
+          mergedLocales[k] = res.text;
+        })
+        .catch(err => {
+          log.warning(`[AutoTranslate]: ${err.message}`);
+          mergedLocales[k] = text;
+        });
+    }));
+
+    log.info(`[AutoTranslate]: ${total - translateTasks.length}/${total}`);
   }
 
   const updateConfRes = await confService.updateConf(
