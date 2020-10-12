@@ -30,8 +30,11 @@ function transformReact(
   );
 
   if (hasTouch) {
-    const parser = isTSX ? 'typescript' : 'babel';
-    const code = prettier.format(source, { ...option.prettier, parser });
+    let code = source;
+    if (option.prettier) {
+      const parser = isTSX ? 'typescript' : 'babel';
+      code = prettier.format(source, { ...option.prettier, parser });
+    }
 
     const target = currentOutput
       ? filePath.replace(currentEntry, currentOutput)
@@ -61,8 +64,11 @@ function transformVueAdapter(
   );
 
   if (hasTouch) {
-    const parser = 'vue';
-    const code = prettier.format(source, { ...option.prettier, parser });
+    let code = source;
+    if (option.prettier) {
+      const parser = 'vue';
+      code = prettier.format(source, { ...option.prettier, parser });
+    }
 
     const target = currentOutput
       ? filePath.replace(currentEntry, currentOutput)

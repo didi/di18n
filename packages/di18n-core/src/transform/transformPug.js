@@ -244,7 +244,14 @@ module.exports = function transformPug(source, localeInfo = {}, options = {}) {
   const ast = parse(tokens);
   traversePug(ast, opts, r);
 
-  const code = r.hasTouch ? genSource(ast) : source;
+  let code = source;
+  if (r.hasTouch) {
+    const genCode = genSource(ast);
+    code = prettier.format(genCode, {
+      filepath: 'xxx.pug',
+      pugAttributeSeparator: 'none',
+    }).trim();
+  }
 
   return { source: code, hasTouch: r.hasTouch };
 };

@@ -52,15 +52,9 @@ module.exports = {
   // e.g. '$t'
   i18nMethod: '$t',
 
-  // prettier conf, <object>
+  // prettier conf, <null | object>
   // e.g. {}
-  prettier: {
-    parser: 'vue',
-    singleQuote: true,
-    trailingComma: 'es5',
-    endOfLine: 'lf',
-    semi: false,
-  },
+  prettier: null,
 
   // i18n saving conf, <object>
   // if localeConf.type !== 'file', localeConf.path is required

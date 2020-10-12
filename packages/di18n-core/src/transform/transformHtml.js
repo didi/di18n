@@ -1,5 +1,6 @@
 const parse5 = require('parse5');
-const Serializer = require('parse5/lib/serializer')
+const Serializer = require('parse5/lib/serializer');
+const { NAMESPACES: NS } = require('parse5/lib/common/html');
 const prettier = require('prettier');
 const mustache = require('mustache');
 const transformJs = require('./transformJs');
@@ -11,31 +12,31 @@ class MySerializer extends Serializer {
     const attrs = this.treeAdapter.getAttrList(node);
 
     for (let i = 0, attrsLength = attrs.length; i < attrsLength; i++) {
-        const attr = attrs[i];
-        const value = Serializer.escapeString(attr.value, true);
+      const attr = attrs[i];
+      const value = Serializer.escapeString(attr.value, true);
 
-        this.html += ' ';
+      this.html += ' ';
 
-        if (!attr.namespace) {
-            this.html += attr.name;
-        } else if (attr.namespace === NS.XML) {
-            this.html += 'xml:' + attr.name;
-        } else if (attr.namespace === NS.XMLNS) {
-            if (attr.name !== 'xmlns') {
-                this.html += 'xmlns:';
-            }
-
-            this.html += attr.name;
-        } else if (attr.namespace === NS.XLINK) {
-            this.html += 'xlink:' + attr.name;
-        } else {
-            this.html += attr.prefix + ':' + attr.name;
+      if (!attr.namespace) {
+        this.html += attr.name;
+      } else if (attr.namespace === NS.XML) {
+        this.html += 'xml:' + attr.name;
+      } else if (attr.namespace === NS.XMLNS) {
+        if (attr.name !== 'xmlns') {
+          this.html += 'xmlns:';
         }
 
-        // 避免出现 <p v-else="">xxx</p> 的情况
-        if (value) {
-            this.html += '="' + value + '"';
-        }
+        this.html += attr.name;
+      } else if (attr.namespace === NS.XLINK) {
+        this.html += 'xlink:' + attr.name;
+      } else {
+        this.html += attr.prefix + ':' + attr.name;
+      }
+
+      // 避免出现 <p v-else="">xxx</p> 的情况
+      if (value) {
+        this.html += '="' + value + '"';
+      }
     }
   }
 }

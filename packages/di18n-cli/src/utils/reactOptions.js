@@ -52,7 +52,7 @@ module.exports = {
   // e.g. 't'
   i18nMethod: 't',
 
-  // prettier conf, <object>
+  // prettier conf, <null | object>
   // e.g. {}
   prettier: {
     singleQuote: true,

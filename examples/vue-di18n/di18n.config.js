@@ -11,12 +11,6 @@ module.exports = {
   importCode: "import { intl } from 'di18n-vue';",
   i18nObject: 'intl',
   i18nMethod: '$t',
-  prettier: {
-    parser: 'vue',
-    singleQuote: true,
-    trailingComma: 'es5',
-    endOfLine: 'lf',
-    semi: false,
-  },
+  prettier: null,
   localeConf: { type: 'file', folder: 'locales' },
 };
