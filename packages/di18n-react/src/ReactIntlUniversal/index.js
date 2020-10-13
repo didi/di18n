@@ -45,6 +45,10 @@ String.prototype.defaultMessage = String.prototype.d = function(msg) {
   return this || msg || '';
 };
 
+function isReactElement(item) {
+  return !!item.$$typeof;
+}
+
 class ReactIntlUniversal {
   constructor() {
     this.options = {
@@ -75,6 +79,18 @@ class ReactIntlUniversal {
       } else {
         variables = args[0];
       }
+    }
+
+    // 处理 jsx
+    if (
+      variables &&
+      Object.values(variables).some(item => isReactElement(item))
+    ) {
+      const { locales, currentLocale } = this.options;
+      const value = locales[currentLocale][message];
+
+      if (!value) return message;
+      return this.formatElement(value, variables);
     }
 
     const key = context ? `${message}{context, ${context}}` : message;
@@ -306,6 +322,58 @@ class ReactIntlUniversal {
 
     // XXX: support other languages later
     return lang.includes('en') ? 'en-US' : 'zh-CN';
+  }
+
+  formatElement(tpl, obj) {
+    const result = [], stack = [];
+    let pushing = false;
+
+    for (let i = 0; i < tpl.length; i++) {
+      if (tpl[i] === '}' && stack.length > 0) {
+        let key = []
+        while (stack.length > 0) {
+          const c = stack.pop()
+          if (c === '{') break;
+
+          key.push(c);
+        }
+
+        if (stack.length > 0) {
+          result.push({ type: 'text', value: stack.join('') });
+          stack.splice(0, stack.length);
+        }
+
+        key = key.reverse().join('').trim();
+
+        if (key) {
+          result.push({ type: 'variable', value: key})
+        }
+
+        pushing = false;
+      } else if (tpl[i] === '{') {
+        stack.push(tpl[i]);
+        pushing = true;
+      } else if (pushing) {
+        stack.push(tpl[i]);
+      } else {
+        if (
+          result.length === 0
+          || result[result.length - 1].type !== 'text'
+        ) {
+          result.push({ type: 'text', value: ''});
+        }
+
+        result[result.length - 1].value += tpl[i];
+      }
+    }
+
+    return (
+      <React.Fragment>
+        {result.map(item => {
+          return item.type === 'text' ? item.value : obj[item.value]
+        })}
+      </React.Fragment>
+    )
   }
 }
 
