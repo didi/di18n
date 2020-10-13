@@ -46,7 +46,7 @@ String.prototype.defaultMessage = String.prototype.d = function(msg) {
 };
 
 function isReactElement(item) {
-  return !!item.$$typeof;
+  return !!(item && item.$$typeof);
 }
 
 class ReactIntlUniversal {
