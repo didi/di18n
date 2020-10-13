@@ -454,7 +454,7 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
       pluginSyntaxJSX,
       pluginSyntaxProposalOptionalChaining,
       pluginSyntaxClassProperties,
-      [pluginSyntaxDecorators, { legacy: true }],
+      [pluginSyntaxDecorators, { decoratorsBeforeExport: true }],
       pluginSyntaxObjectRestSpread,
       pluginSyntaxAsyncGenerators,
       pluginSyntaxDoExpressions,
@@ -492,7 +492,7 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
 
   // XXX: decorator bug
   // https://stackoverflow.com/a/55478641
-  let { code } = generate(ast, { retainLines: false }, source);
+  let { code } = generate(ast, { retainLines: false, decoratorsBeforeExport: true }, source);
 
   if (!r.hasTouch) {
     code = source;
