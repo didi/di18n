@@ -369,8 +369,10 @@ class ReactIntlUniversal {
 
     return (
       <React.Fragment>
-        {result.map(item => {
-          return item.type === 'text' ? item.value : obj[item.value]
+        {result.map((item, idx) => {
+          return <React.Fragment key={idx}>
+            {item.type === 'text' ? item.value : obj[item.value]}
+          </React.Fragment>
         })}
       </React.Fragment>
     )
