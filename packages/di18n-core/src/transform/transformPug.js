@@ -115,11 +115,18 @@ function traversePug(ast, {
 
     if (!hasTouch) return source;
 
-    return prettier.format(source1, {
+    let code = prettier.format(source1, {
       parser: 'babel',
       singleQuote: true,
       semi: false,
-    }).trim();
+    });
+    
+    code = code.trim().replace(/\s+/g, ' ');
+
+    // 去掉开头的分号
+    if (code[0] === ';') code = code.slice(1);
+
+    return code;
   }
 
   function traverse(node) {
