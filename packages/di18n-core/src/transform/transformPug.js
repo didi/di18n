@@ -120,7 +120,7 @@ function traversePug(ast, {
       singleQuote: true,
       semi: false,
     });
-    
+
     code = code.trim().replace(/\s+/g, ' ');
 
     // 去掉开头的分号
