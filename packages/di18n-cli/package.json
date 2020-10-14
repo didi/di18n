@@ -1,6 +1,6 @@
 {
   "name": "di18n-cli",
-  "version": "0.1.18",
+  "version": "0.1.20",
   "main": "index.js",
   "license": "MIT",
   "bin": {
