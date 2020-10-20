@@ -98,7 +98,7 @@ function traversePug(ast, {
   }
 
   function transformJsExpression(source) {
-    const { source: source1, hasTouch } = transformJs(
+    const { source: source1 } = transformJs(
       source,
       {
         allTranslated,
@@ -112,8 +112,6 @@ function traversePug(ast, {
         importCode: '',
       }
     );
-
-    if (!hasTouch) return source;
 
     let code = prettier.format(source1, {
       parser: 'babel',
