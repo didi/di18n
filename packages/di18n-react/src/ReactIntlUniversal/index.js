@@ -19,24 +19,6 @@ import * as constants from './constants';
 import merge from 'lodash.merge';
 import isElectron from 'is-electron';
 
-const COMMON_LOCALE_DATA_URLS = {
-  en: 'https://img-ys011.didistatic.com/static/apollo_js/di18n-local-data.1.0.0.en.js',
-  zh: 'https://img-ys011.didistatic.com/static/apollo_js/di18n-local-data.1.0.0.zh.js',
-  fr: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/fr.js',
-  fa: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/fa.js',
-  ja: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/ja.js',
-  de: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/de.js',
-  es: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/es.js',
-  ko: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/ko.js',
-  pt: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/pt.js',
-  it: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/it.js',
-  ru: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/ru.js',
-  pl: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/pl.js',
-  nl: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/nl.js',
-  sv: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/sv.js',
-  tr: 'https://g.alicdn.com/react-intl-universal/locale-data/1.0.0/tr.js',
-};
-
 const isBrowser =
   !isElectron() &&
   !!(typeof window !== 'undefined' && window.document && window.document.createElement);
@@ -58,7 +40,6 @@ class ReactIntlUniversal {
       locales: {}, // app locale data like {"en-US":{"key1":"value1"},"zh-CN":{"key1":"值1"}}
       warningHandler: console.warn.bind(console), // ability to accumulate missing messages using third party services like Sentry
       escapeHtml: true, // disable escape html in variable mode
-      commonLocaleDataUrls: COMMON_LOCALE_DATA_URLS,
       fallbackLocale: null, // Locale to use if a key is not found in the current locale
     };
 
@@ -247,28 +228,9 @@ class ReactIntlUniversal {
     this.options.currentLocale = options.currentLocale;
     this.options.formats = Object.assign({}, this.options.formats, constants.defaultFormats);
 
-    return new Promise((resolve, reject) => {
-      const lang = this.options.currentLocale.split('-')[0].split('_')[0];
-      const langUrl = this.options.commonLocaleDataUrls[lang];
-      if (isBrowser) {
-        if (langUrl) {
-          load(langUrl, (err, script) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
-        } else {
-          console.warn(
-            `Language "${lang}" is not supported. Check https://github.com/alibaba/react-intl-universal/releases/tag/1.12.0`
-          );
-          resolve();
-        }
-      } else {
-        // For Node.js, common locales are added in the application
-        resolve();
-      }
+    return new Promise(resolve => {
+      // not load commonLocaleDataUrls anymore
+      resolve();
     });
   }
 
