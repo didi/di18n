@@ -18,6 +18,7 @@ import 'console-polyfill';
 import * as constants from './constants';
 import merge from 'lodash.merge';
 import isElectron from 'is-electron';
+import detectBrowserLocale from './detectBrowserLocale';
 
 const isBrowser =
   !isElectron() &&
@@ -280,10 +281,7 @@ class ReactIntlUniversal {
   }
 
   getLocaleFromBrowser() {
-    const lang = navigator.language || navigator.userLanguage;
-
-    // XXX: support other languages later
-    return lang.includes('en') ? 'en-US' : 'zh-CN';
+    return detectBrowserLocale();
   }
 
   formatElement(tpl, obj) {

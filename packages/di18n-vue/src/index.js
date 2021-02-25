@@ -1,4 +1,5 @@
 import Cookie from 'js-cookie';
+import detectBrowserLocale from './detectBrowserLocale';
 
 export { default as VueI18n } from 'vue-i18n';
 
@@ -35,8 +36,7 @@ export function getLocale(cookieLocaleKey) {
   let locale = Cookie.get(_cookieLocaleKey);
   if (locale) return locale;
 
-  locale = navigator.language || '';
-  return locale.includes('en') ? 'en-US' : 'zh-CN';
+  return detectBrowserLocale();
 }
 
 export function setLocale(locale, hardReload, cookieLocaleKey) {
