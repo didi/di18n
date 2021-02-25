@@ -3,6 +3,7 @@ module.exports = {
   exclude: [],
   output: ['src'],
   disableAutoTranslate: true,
+  extractOnly: false,
   translator: null,
   ignoreComponents: [],
   ignoreMethods: [],

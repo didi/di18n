@@ -29,7 +29,7 @@ function transformReact(
     option
   );
 
-  if (hasTouch) {
+  if (!option.extractOnly && hasTouch) {
     let code = source;
     if (option.prettier) {
       const parser = isTSX ? 'typescript' : 'babel';
@@ -63,7 +63,7 @@ function transformVueAdapter(
     option
   );
 
-  if (hasTouch) {
+  if (!option.extractOnly && hasTouch) {
     let code = source;
     if (option.prettier) {
       const parser = 'vue';

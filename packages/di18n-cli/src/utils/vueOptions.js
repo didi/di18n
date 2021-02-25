@@ -16,6 +16,10 @@ module.exports = {
   // e.g. true
   disableAutoTranslate: true,
 
+  // only extract locales, not touch source code, <boolean>
+  // e.g. true
+  extractOnly: false,
+
   // translator, <null | string>
   // null: default google translator
   // e.g. ../translate/google.js
