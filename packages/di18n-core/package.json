@@ -20,7 +20,7 @@
     "@babel/preset-typescript": "^7.18.6",
     "@babel/traverse": "^7.18.10",
     "@babel/types": "^7.18.10",
-    "@prettier/plugin-pug": "^2.2.0",
+    "@prettier/plugin-pug": "^1.8.1",
     "@typescript-eslint/typescript-estree": "^5.32.0",
     "@vitalets/google-translate-api": "^8.0.0",
     "chalk": "^3.0.0",
