@@ -10,7 +10,6 @@ const pluginSyntaxObjectRestSpread = require('@babel/plugin-syntax-object-rest-s
 const pluginSyntaxAsyncGenerators = require('@babel/plugin-syntax-async-generators');
 const pluginSyntaxDoExpressions = require('@babel/plugin-syntax-do-expressions');
 const pluginSyntaxDynamicImport = require('@babel/plugin-syntax-dynamic-import');
-const pluginSyntaxExportExtensions = require('@babel/plugin-syntax-export-extensions');
 const pluginSyntaxFunctionBind = require('@babel/plugin-syntax-function-bind');
 const getConvert2Plugin = require('../plugin/reactIntlUniversalToDi18n');
 const log = require('../utils/log');

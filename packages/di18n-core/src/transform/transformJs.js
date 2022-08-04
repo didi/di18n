@@ -10,7 +10,6 @@ const pluginSyntaxObjectRestSpread = require('@babel/plugin-syntax-object-rest-s
 const pluginSyntaxAsyncGenerators = require('@babel/plugin-syntax-async-generators');
 const pluginSyntaxDoExpressions = require('@babel/plugin-syntax-do-expressions');
 const pluginSyntaxDynamicImport = require('@babel/plugin-syntax-dynamic-import');
-const pluginSyntaxExportExtensions = require('@babel/plugin-syntax-export-extensions');
 const pluginSyntaxFunctionBind = require('@babel/plugin-syntax-function-bind');
 
 function getIgnoreLines(ast) {
@@ -492,7 +491,7 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
 
   // XXX: decorator bug
   // https://stackoverflow.com/a/55478641
-  let { code } = generate(ast, { retainLines: false, decoratorsBeforeExport: true }, source);
+  let { code } = generate(ast, { retainLines: true, decoratorsBeforeExport: true }, source);
 
   if (!r.hasTouch) {
     code = source;
