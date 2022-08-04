@@ -68,7 +68,6 @@ module.exports = function transformReactIntlToReactIntlUniversal(option) {
         pluginSyntaxAsyncGenerators,
         pluginSyntaxDoExpressions,
         pluginSyntaxDynamicImport,
-        pluginSyntaxExportExtensions,
         pluginSyntaxFunctionBind,
         reactIntlToReactIntlUniversal(zhData, outObj),
       ],

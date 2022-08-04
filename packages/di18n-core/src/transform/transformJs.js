@@ -458,7 +458,6 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
       pluginSyntaxAsyncGenerators,
       pluginSyntaxDoExpressions,
       pluginSyntaxDynamicImport,
-      pluginSyntaxExportExtensions,
       pluginSyntaxFunctionBind,
       ...babelPlugins,
     ],

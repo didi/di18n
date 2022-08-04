@@ -41,7 +41,6 @@ function translate(codeFileInfo, allConverted, option) {
       pluginSyntaxAsyncGenerators,
       pluginSyntaxDoExpressions,
       pluginSyntaxDynamicImport,
-      pluginSyntaxExportExtensions,
       pluginSyntaxFunctionBind,
       getConvert2Plugin(outObj, allConverted, intlAlias),
     ],
