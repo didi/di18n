@@ -488,7 +488,6 @@ module.exports = function transformJs(source, localeInfo = {}, options = {}) {
 
   traverse(ast, visitor);
 
-  // XXX: decorator bug
   // https://stackoverflow.com/a/55478641
   let { code } = generate(ast, { retainLines: true, decoratorsBeforeExport: true }, source);
 
