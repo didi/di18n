@@ -1,6 +1,6 @@
 {
   "name": "di18n-vue",
-  "version": "0.1.24",
+  "version": "0.1.25",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
