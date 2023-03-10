@@ -1,6 +1,6 @@
 {
   "name": "di18n-react",
-  "version": "0.1.25",
+  "version": "0.1.28",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "typings": "index.d.ts",
