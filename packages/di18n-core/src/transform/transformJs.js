@@ -267,7 +267,7 @@ function makeVisitor({
 
         path.skip();
       } else if (isPrimary(value)) {
-        console.warn('ignore 1!!!!!!', value);
+        console.warn('ignore 1', value);
       }
     },
 
