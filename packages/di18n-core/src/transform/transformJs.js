@@ -216,7 +216,8 @@ function makeVisitor({
       const { node } = path;
       const { value } = node;
 
-      if (!shouldIgnore(node) && isPrimary(node.value)) {
+      const isTsLiteralType = node.type === 'StringLiteral' && (['TSLiteralType', 'TSEnumMember'].includes(path.parent.type))
+      if (!shouldIgnore(node) && isPrimary(node.value) && !isTsLiteralType) {
         switch (path.parent.type) {
           case 'ObjectProperty':
           case 'AssignmentExpression':
